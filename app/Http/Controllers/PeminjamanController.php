@@ -11,35 +11,37 @@ class PeminjamanController extends Controller
 {
     public function index()
     {
-        // Ambil data peminjaman beserta relasi user dan buku, urutkan dari yang terbaru
-        $data['peminjaman'] = Peminjaman::with(['user', 'buku'])->orderBy('tgl_pinjam', 'desc')->get(); [cite: 200]
-        return view('peminjaman.index', $data);
+        $peminjaman = \App\Models\Peminjaman::with(['user', 'buku'])
+            ->latest('tgl_pinjam')
+            ->paginate(10);
+
+        return view('peminjaman.index', compact('peminjaman'));
     }
 
     public function create()
     {
         // Ambil data users dan buku untuk dropdown
         $data['users'] = User::all();
-        $data['buku'] = Buku::all(); [cite: 208]
+        $data['buku'] = Buku::all();
         return view('peminjaman.create', $data);
     }
 
     public function store(Request $request)
     {
         // Validasi
-        $this->validate($request, [
+        $request->validate([
             'id_user' => 'required',
             'id_buku' => 'required',
             'tgl_pinjam' => 'required|date',
-        ]); [cite: 214]
+        ]);
 
         // Buat data peminjaman baru
-        Peminjaman::create([
+        \App\Models\Peminjaman::create([
             'id_user' => $request->id_user,
             'id_buku' => $request->id_buku,
             'tgl_pinjam' => $request->tgl_pinjam,
-            'status' => 'pinjam' // Status default adalah 'pinjam'
-        ]); [cite: 215]
+            'status' => 'pinjam'
+        ]);
 
         return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman berhasil ditambahkan');
     }
@@ -55,14 +57,14 @@ class PeminjamanController extends Controller
         // Ubah status menjadi 'kembali' dan isi tgl_kembali
         $peminjaman->status = 'kembali';
         $peminjaman->tgl_kembali = now(); // Menggunakan tanggal dan waktu saat ini
-        $peminjaman->save(); [cite: 218]
+        $peminjaman->save();
 
         return redirect()->back()->with('success', 'Buku telah berhasil dikembalikan');
     }
 
     // Fungsi show, update, dan destroy tidak digunakan sesuai alur PDF,
     // jadi bisa dibiarkan kosong atau dihapus jika resource route tidak diperlukan sepenuhnya.
-    public function show(string $id){}
-    public function update(Request $request, string $id){}
-    public function destroy(string $id){}
+    public function show(string $id) {}
+    public function update(Request $request, string $id) {}
+    public function destroy(string $id) {}
 }

@@ -12,8 +12,8 @@ class PenerbitController extends Controller
      */
     public function index()
     {
-        $penerbit = \App\Models\Penerbit::all();
-        $data['penerbit'] = Penerbit::all();
+        $penerbit = \App\Models\Penerbit::latest()->paginate(10);
+
         return view('penerbit.index', compact('penerbit'));
     }
 
@@ -22,7 +22,7 @@ class PenerbitController extends Controller
      */
     public function create()
     {
-        return view('penerbit.index', compact('penerbit'));
+        return view('penerbit.create');
     }
 
     /**
@@ -30,7 +30,7 @@ class PenerbitController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'nama_penerbit' => 'required'
         ]);
 
@@ -55,13 +55,16 @@ class PenerbitController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $this->validate($request, [
+        // Cukup ganti "$this" menjadi "$request"
+        $request->validate([
             'nama_penerbit' => 'required'
         ]);
 
-        $penerbit = Penerbit::find($id);
-        $penerbit->nama_penerbit = $request->nama_penerbit;
-        $penerbit->save();
+        // ... sisa kode untuk update data ...
+        $penerbit = \App\Models\Penerbit::find($id);
+        $penerbit->update([
+            'nama_penerbit' => $request->nama_penerbit
+        ]);
 
         return redirect()->route('penerbit.index')->with('success', 'Data berhasil diubah');
     }
@@ -72,7 +75,7 @@ class PenerbitController extends Controller
     public function destroy(string $id)
     {
         $penerbit = Penerbit::find($id);
-        $penerbit->delete(); 
+        $penerbit->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus');
     }

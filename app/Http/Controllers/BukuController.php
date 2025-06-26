@@ -8,10 +8,24 @@ use Illuminate\Http\Request;
 
 class BukuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Ambil data buku dengan relasi penerbitnya
-        $data['buku'] = Buku::with('penerbit')->get();
+        $search = $request->input('search');
+        $query = \App\Models\Buku::with('penerbit');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                // Cari berdasarkan judul buku
+                $q->where('judul_buku', 'like', '%' . $search . '%')
+                    // ATAU cari berdasarkan nama penerbit (melalui relasi)
+                    ->orWhereHas('penerbit', function ($subq) use ($search) {
+                        $subq->where('nama_penerbit', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+        $data['buku'] = $query->latest()->paginate(10);
+
         return view('buku.index', $data);
     }
 
@@ -25,7 +39,7 @@ class BukuController extends Controller
     public function store(Request $request)
     {
         // Validasi input sesuai aturan di PDF
-        $this->validate($request, [
+        $request->validate([
             'judul_buku'    => 'required',
             'id_penerbit'   => 'required',
             'tahun_terbit'  => 'required',
@@ -56,7 +70,7 @@ class BukuController extends Controller
     public function update(Request $request, string $id)
     {
         // Validasi input
-        $this->validate($request, [
+        $request->validate([
             'judul_buku'    => 'required',
             'id_penerbit'   => 'required',
             'tahun_terbit'  => 'required',
