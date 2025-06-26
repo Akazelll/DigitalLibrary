@@ -8,6 +8,21 @@ use Illuminate\Http\Request;
 
 class BukuController extends Controller
 {
+    /**
+     * Terapkan middleware di constructor untuk proteksi rute.
+     */
+    public function __construct()
+    {
+        // Hanya admin yang bisa mengakses semua method KECUALI 'index' dan 'show'.
+        $this->middleware(['auth', 'is.admin'])->except(['index', 'show']);
+        
+        // Semua user yang sudah login bisa mengakses 'index' dan 'show'.
+        $this->middleware('auth')->only(['index', 'show']);
+    }
+
+    /**
+     * Menampilkan daftar buku dengan fitur pencarian dan pagination.
+     */
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -16,9 +31,9 @@ class BukuController extends Controller
         $buku = Buku::with('penerbit')
             ->when($search, function ($query, $search) {
                 return $query->where('judul_buku', 'like', "%{$search}%")
-                    ->orWhereHas('penerbit', function ($q) use ($search) {
-                        $q->where('nama_penerbit', 'like', "%{$search}%");
-                    });
+                             ->orWhereHas('penerbit', function ($q) use ($search) {
+                                 $q->where('nama_penerbit', 'like', "%{$search}%");
+                             });
             })
             ->latest()
             ->paginate(10);
@@ -70,7 +85,7 @@ class BukuController extends Controller
         // findOrFail akan otomatis menampilkan error 404 jika ID tidak ditemukan
         $buku = Buku::findOrFail($id);
         $penerbit = Penerbit::all();
-
+        
         return view('buku.edit', compact('buku', 'penerbit'));
     }
 

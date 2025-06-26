@@ -91,7 +91,7 @@
                 <th>Peminjam</th>
                 <th>Judul Buku</th>
                 <th>Tanggal Pinjam</th>
-                <th>Tanggal Kembali</th>
+                <th>Tanggl Kembali</th>
                 <th>Status</th>
             </tr>
         </thead>

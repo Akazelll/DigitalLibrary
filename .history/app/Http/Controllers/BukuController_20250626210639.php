@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 
 class BukuController extends Controller
 {
+    /**
+     * Terapkan middleware di constructor untuk proteksi rute.
+     */
+   
+
+    /**
+     * Menampilkan daftar buku dengan fitur pencarian dan pagination.
+     */
     public function index(Request $request)
     {
         $search = $request->input('search');

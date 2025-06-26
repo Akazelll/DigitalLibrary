@@ -90,8 +90,8 @@
                 <th>No</th>
                 <th>Peminjam</th>
                 <th>Judul Buku</th>
-                <th>Tanggal Pinjam</th>
-                <th>Tanggal Kembali</th>
+                <th>Tgl Pinjam</th>
+                <th>Tgl Kembali</th>
                 <th>Status</th>
             </tr>
         </thead>

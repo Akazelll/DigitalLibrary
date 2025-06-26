@@ -1,4 +1,4 @@
-{{-- Kita tidak lagi menggunakan <x-guest-layout> agar bisa membuat layout custom yang sama seperti halaman login --}}
+{{-- Kita tidak lagi menggunakan <x-guest-layout> agar bisa membuat layout custom --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>Lupa Password - {{ config('app.name', 'Laravel') }}</title>
+        <title>Konfirmasi Password - {{ config('app.name', 'Laravel') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -25,30 +25,29 @@
                         <span class="font-semibold text-2xl text-gray-900 dark:text-white">{{ config('app.name', 'Laravel') }}</span>
                     </a>
                 </div>
-                
-                <div class="mb-4 text-sm text-gray-600 dark:text-gray-400 text-center">
-                    {{ __('Lupa password Anda? Tidak masalah. Cukup beritahu kami alamat email Anda dan kami akan mengirimkan tautan untuk mengatur ulang password baru.') }}
+
+                <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('Ini adalah area aman dari aplikasi. Mohon konfirmasi password Anda sebelum melanjutkan.') }}
                 </div>
 
-                <x-auth-session-status class="mb-4" :status="session('status')" />
-
-                <form method="POST" action="{{ route('password.email') }}">
+                <form method="POST" action="{{ route('password.confirm') }}">
                     @csrf
 
                     <div>
-                        <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        <x-input-label for="password" :value="__('Password')" />
+
+                        <x-text-input id="password" class="block mt-1 w-full"
+                                        type="password"
+                                        name="password"
+                                        required autocomplete="current-password" />
+
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
-                    <div class="flex flex-col items-center justify-end mt-6">
-                        <x-primary-button class="w-full flex justify-center">
-                            {{ __('Kirim Tautan Reset Password') }}
+                    <div class="flex justify-end mt-4">
+                        <x-primary-button>
+                            {{ __('Konfirmasi') }}
                         </x-primary-button>
-                        
-                        <a href="{{ route('login') }}" class="mt-4 underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                            Kembali ke Login
-                        </a>
                     </div>
                 </form>
             </div>

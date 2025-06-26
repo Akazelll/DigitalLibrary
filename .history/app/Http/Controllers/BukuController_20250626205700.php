@@ -8,6 +8,21 @@ use Illuminate\Http\Request;
 
 class BukuController extends Controller
 {
+    /**
+     * Terapkan middleware di constructor untuk proteksi rute.
+     */
+    public function __construct()
+    {
+        // Hanya admin yang bisa mengakses semua method KECUALI 'index' dan 'show'.
+        $this->middleware(['auth', 'is.admin'])->except(['index', 'show']);
+
+        // Semua user yang sudah login bisa mengakses 'index' dan 'show'.
+        $this->middleware('auth')->only(['index', 'show']);
+    }
+
+    /**
+     * Menampilkan daftar buku dengan fitur pencarian dan pagination.
+     */
     public function index(Request $request)
     {
         $search = $request->input('search');

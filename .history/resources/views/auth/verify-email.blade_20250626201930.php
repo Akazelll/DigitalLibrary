@@ -1,3 +1,4 @@
+{{-- Kita tidak lagi menggunakan <x-guest-layout> agar bisa membuat layout custom --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
