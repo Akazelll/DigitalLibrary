@@ -10,91 +10,96 @@ class BukuController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil data buku dengan relasi penerbitnya
         $search = $request->input('search');
-        $query = \App\Models\Buku::with('penerbit');
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                // Cari berdasarkan judul buku
-                $q->where('judul_buku', 'like', '%' . $search . '%')
-                    // ATAU cari berdasarkan nama penerbit (melalui relasi)
-                    ->orWhereHas('penerbit', function ($subq) use ($search) {
-                        $subq->where('nama_penerbit', 'like', '%' . $search . '%');
+        // Query yang lebih rapi
+        $buku = Buku::with('penerbit')
+            ->when($search, function ($query, $search) {
+                return $query->where('judul_buku', 'like', "%{$search}%")
+                    ->orWhereHas('penerbit', function ($q) use ($search) {
+                        $q->where('nama_penerbit', 'like', "%{$search}%");
                     });
-            });
-        }
-        $data['buku'] = $query->latest()->paginate(10);
+            })
+            ->latest()
+            ->paginate(10);
 
-        return view('buku.index', $data);
+        // Mengirim data menggunakan compact() agar lebih bersih
+        return view('buku.index', compact('buku'));
     }
 
+    /**
+     * Menampilkan form untuk membuat buku baru.
+     */
     public function create()
     {
-        // Ambil semua data penerbit untuk ditampilkan di dropdown
-        $data['penerbit'] = Penerbit::all();
-        return view('buku.create', $data);
+        $penerbit = Penerbit::all();
+        return view('buku.create', compact('penerbit'));
     }
 
+    /**
+     * Menyimpan buku baru ke database.
+     */
     public function store(Request $request)
     {
-        // Validasi input sesuai aturan di PDF
         $request->validate([
-            'judul_buku'    => 'required',
-            'id_penerbit'   => 'required',
-            'tahun_terbit'  => 'required',
-            'jml_halaman'   => 'required'
+            'judul_buku'    => 'required|string|max:255',
+            'id_penerbit'   => 'required|exists:penerbit,id',
+            'tahun_terbit'  => 'required|digits:4|integer|min:1900',
+            'jml_halaman'   => 'required|integer|min:1'
         ]);
 
-        // Buat data buku baru
-        Buku::create([
-            'judul_buku'    => $request->judul_buku,
-            'id_penerbit'   => $request->id_penerbit,
-            'tahun_terbit'  => $request->tahun_terbit,
-            'jml_halaman'   => $request->jml_halaman
-        ]);
+        Buku::create($request->all());
 
-        return redirect()->route('buku.index')->with('success', 'Buku berhasil disimpan');
+        return redirect()->route('buku.index')->with('success', 'Buku berhasil disimpan.');
     }
 
+    /**
+     * Menampilkan form untuk mengedit buku.
+     */
+    public function show(string $id)
+    {
+        // Biasanya method 'show' untuk menampilkan detail, bisa diarahkan ke 'edit'
+        return redirect()->route('buku.edit', $id);
+    }
+
+    /**
+     * Menampilkan form untuk mengedit buku.
+     */
     public function edit(string $id)
     {
-        // Cari buku berdasarkan ID
-        $data['buku'] = Buku::find($id);
-        // Ambil semua data penerbit untuk dropdown
-        $data['penerbit'] = Penerbit::all();
+        // findOrFail akan otomatis menampilkan error 404 jika ID tidak ditemukan
+        $buku = Buku::findOrFail($id);
+        $penerbit = Penerbit::all();
 
-        return view('buku.edit', $data);
+        return view('buku.edit', compact('buku', 'penerbit'));
     }
 
+    /**
+     * Mengupdate data buku di database.
+     */
     public function update(Request $request, string $id)
     {
-        // Validasi input
         $request->validate([
-            'judul_buku'    => 'required',
-            'id_penerbit'   => 'required',
-            'tahun_terbit'  => 'required',
-            'jml_halaman'   => 'required'
+            'judul_buku'    => 'required|string|max:255',
+            'id_penerbit'   => 'required|exists:penerbit,id',
+            'tahun_terbit'  => 'required|digits:4|integer|min:1900',
+            'jml_halaman'   => 'required|integer|min:1'
         ]);
 
-        // Cari buku dan update datanya
-        $buku = Buku::find($id);
-        $buku->update([
-            'judul_buku'    => $request->judul_buku,
-            'id_penerbit'   => $request->id_penerbit,
-            'tahun_terbit'  => $request->tahun_terbit,
-            'jml_halaman'   => $request->jml_halaman
-        ]);
+        $buku = Buku::findOrFail($id);
+        $buku->update($request->all());
 
-        return redirect()->route('buku.index')->with('success', 'Buku berhasil diubah');
+        return redirect()->route('buku.index')->with('success', 'Buku berhasil diubah.');
     }
 
+    /**
+     * Menghapus buku dari database.
+     */
     public function destroy(string $id)
     {
-        // Cari buku dan hapus
-        $buku = Buku::find($id);
+        $buku = Buku::findOrFail($id);
         $buku->delete();
 
-        return redirect()->back()->with('success', 'Buku berhasil dihapus');
+        return redirect()->back()->with('success', 'Buku berhasil dihapus.');
     }
 }
