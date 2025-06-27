@@ -87,6 +87,10 @@ class BukuController extends Controller
     {
         $buku = \App\Models\Buku::findOrFail($id);
         $buku->delete();
+
+        // INI BAGIAN YANG DIPERBAIKI
+        // Mengarahkan kembali ke halaman sebelumnya (halaman daftar buku)
+        // dengan pesan sukses.
         return redirect()->back()->with('success', 'Buku berhasil dihapus.');
     }
 }

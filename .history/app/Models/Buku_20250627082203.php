@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Buku extends Model
 {
-    use HasFactory, SoftDeletes;
+    php artisan migrate
     protected $table = 'buku';
     protected $fillable = ['judul_buku', 'id_penerbit', 'tahun_terbit', 'jml_halaman'];
 

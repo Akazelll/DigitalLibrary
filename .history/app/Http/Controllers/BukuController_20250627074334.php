@@ -12,7 +12,7 @@ class BukuController extends Controller
     {
         $search = $request->input('search');
 
-
+        
         $buku = Buku::with('penerbit')
             ->when($search, function ($query, $search) {
                 return $query->where('judul_buku', 'like', "%{$search}%")
@@ -23,18 +23,18 @@ class BukuController extends Controller
             ->latest()
             ->paginate(10);
 
-
+       
         return view('buku.index', compact('buku'));
     }
 
-
+    
     public function create()
     {
         $penerbit = Penerbit::all();
         return view('buku.create', compact('penerbit'));
     }
 
-
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -49,24 +49,24 @@ class BukuController extends Controller
         return redirect()->route('buku.index')->with('success', 'Buku berhasil disimpan.');
     }
 
-
+    
     public function show(string $id)
     {
-
+        
         return redirect()->route('buku.edit', $id);
     }
 
-
+    
     public function edit(string $id)
     {
-
+       
         $buku = Buku::findOrFail($id);
         $penerbit = Penerbit::all();
 
         return view('buku.edit', compact('buku', 'penerbit'));
     }
 
-
+    
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -82,11 +82,14 @@ class BukuController extends Controller
         return redirect()->route('buku.index')->with('success', 'Buku berhasil diubah.');
     }
 
-
+    /**
+     * Menghapus buku dari database.
+     */
     public function destroy(string $id)
     {
-        $buku = \App\Models\Buku::findOrFail($id);
+        $buku = Buku::findOrFail($id);
         $buku->delete();
+
         return redirect()->back()->with('success', 'Buku berhasil dihapus.');
     }
 }

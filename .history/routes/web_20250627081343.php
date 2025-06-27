@@ -18,12 +18,13 @@ use App\Models\Peminjaman;
 |--------------------------------------------------------------------------
 */
 
+// Halaman Welcome
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Rute Dashboard
 Route::get('/dashboard', function () {
-    // ... (logika dashboard Anda sudah benar) ...
     $hour = now('Asia/Jakarta')->hour;
     if ($hour < 11) {
         $greeting = 'Selamat Pagi🌄';
@@ -34,7 +35,9 @@ Route::get('/dashboard', function () {
     } else {
         $greeting = 'Selamat Malam🌙';
     }
+
     $viewData = ['greeting' => $greeting];
+
     if (Auth::user()->role == 'admin') {
         $viewData['totalPenerbit'] = Penerbit::count();
         $viewData['totalBuku'] = Buku::count();
@@ -44,29 +47,32 @@ Route::get('/dashboard', function () {
     } else {
         $viewData['peminjamanUser'] = Peminjaman::where('id_user', Auth::id())->with('buku')->latest('tgl_pinjam')->get();
     }
+
     return view('dashboard', $viewData);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+// Grup rute yang hanya bisa diakses setelah login
 Route::middleware('auth')->group(function () {
+    // Rute profil user
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // === RUTE APLIKASI PERPUSTAKAAN ===
 
-    // Rute Buku yang bisa diakses SEMUA user login
+    // Rute Buku yang bisa diakses SEMUA user login (untuk melihat dan mencari)
     Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
-    // PENTING: Rute statis seperti 'create' harus didefinisikan SEBELUM rute dinamis seperti '{buku}'
-    Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create')->middleware('is.admin');
     Route::get('/buku/{buku}', [BukuController::class, 'show'])->name('buku.show');
 
     // Grup rute yang HANYA bisa diakses oleh ADMIN
     Route::middleware('is.admin')->group(function () {
         // Rute CRUD untuk Penerbit dan Peminjaman
-        Route::resource('penerbit', PenerbitController::class)->except(['show']); // Method show tidak kita gunakan
-        Route::resource('peminjaman', PeminjamanController::class)->except(['show', 'destroy']); // Method show & destroy tidak kita gunakan
+        Route::resource('penerbit', PenerbitController::class);
+        Route::resource('peminjaman', PeminjamanController::class);
 
-        // Rute CRUD untuk Buku yang khusus Admin (tanpa create, index, show)
+        // Rute CRUD untuk Buku yang khusus Admin
+        Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
         Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
         Route::get('/buku/{buku}/edit', [BukuController::class, 'edit'])->name('buku.edit');
         Route::put('/buku/{buku}', [BukuController::class, 'update'])->name('buku.update');

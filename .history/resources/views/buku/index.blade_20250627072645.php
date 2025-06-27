@@ -35,6 +35,7 @@
                         </div>
                     </div>
 
+                    {{-- Pesan Sukses --}}
                     @if (session()->has('success'))
                         <div class="mb-4 rounded-md bg-green-100 dark:bg-green-800 p-4">
                             <p class="text-sm font-medium text-green-700 dark:text-green-200">{{ session('success') }}
@@ -42,6 +43,7 @@
                         </div>
                     @endif
 
+                    {{-- Tabel Data --}}
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -70,13 +72,13 @@
                                         @if (Auth::user()->role == 'admin')
                                             <td
                                                 class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                {{-- Form untuk Hapus --}}
                                                 <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
-                                                    id="delete-form-buku-{{ $item->id }}" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
+                                                    id="delete-form-buku-{{ $item->id }}">
                                                     <a href="{{ route('buku.edit', $item->id) }}"
                                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">Edit</a>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    {{-- Memanggil fungsi showAlert dengan parameter id dan nama modul --}}
                                                     <button type="button"
                                                         onclick="showAlert({{ $item->id }}, 'buku')"
                                                         class="ml-4 text-red-600 dark:text-red-400 hover:text-red-900">Hapus</button>
@@ -94,6 +96,7 @@
                         </table>
                     </div>
 
+                    {{-- Link Pagination --}}
                     <div class="mt-6">
                         {{ $buku->appends(request()->query())->links() }}
                     </div>
@@ -103,6 +106,9 @@
         </div>
     </div>
 
+    {{-- ======================================================= --}}
+    {{-- === SCRIPT SWEETALERT DITAMBAHKAN DI SINI === --}}
+    {{-- ======================================================= --}}
     @push('scripts')
         <style type="text/tailwindcss">
             .swal2-popup {
@@ -118,6 +124,7 @@
             }
         </style>
         <script>
+            // Fungsi untuk menampilkan SweetAlert2 dengan tema
             function showAlert(id, module) {
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -136,10 +143,12 @@
                     buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Menggunakan id dan nama modul untuk menemukan form yang benar
                         document.getElementById(`delete-form-${module}-${id}`).submit();
                     }
                 })
             }
         </script>
     @endpush
+
 </x-app-layout>

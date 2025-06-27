@@ -85,8 +85,9 @@ class BukuController extends Controller
 
     public function destroy(string $id)
     {
-        $buku = \App\Models\Buku::findOrFail($id);
+        $buku = Buku::findOrFail($id);
         $buku->delete();
+
         return redirect()->back()->with('success', 'Buku berhasil dihapus.');
     }
 }

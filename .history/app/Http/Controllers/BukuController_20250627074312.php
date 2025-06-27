@@ -12,7 +12,7 @@ class BukuController extends Controller
     {
         $search = $request->input('search');
 
-
+        // Query yang lebih rapi
         $buku = Buku::with('penerbit')
             ->when($search, function ($query, $search) {
                 return $query->where('judul_buku', 'like', "%{$search}%")
@@ -23,18 +23,22 @@ class BukuController extends Controller
             ->latest()
             ->paginate(10);
 
-
+        // Mengirim data menggunakan compact() agar lebih bersih
         return view('buku.index', compact('buku'));
     }
 
-
+    /**
+     * Menampilkan form untuk membuat buku baru.
+     */
     public function create()
     {
         $penerbit = Penerbit::all();
         return view('buku.create', compact('penerbit'));
     }
 
-
+    /**
+     * Menyimpan buku baru ke database.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -49,24 +53,28 @@ class BukuController extends Controller
         return redirect()->route('buku.index')->with('success', 'Buku berhasil disimpan.');
     }
 
-
+    
     public function show(string $id)
     {
-
+        
         return redirect()->route('buku.edit', $id);
     }
 
-
+    /**
+     * Menampilkan form untuk mengedit buku.
+     */
     public function edit(string $id)
     {
-
+        // findOrFail akan otomatis menampilkan error 404 jika ID tidak ditemukan
         $buku = Buku::findOrFail($id);
         $penerbit = Penerbit::all();
 
         return view('buku.edit', compact('buku', 'penerbit'));
     }
 
-
+    /**
+     * Mengupdate data buku di database.
+     */
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -82,11 +90,14 @@ class BukuController extends Controller
         return redirect()->route('buku.index')->with('success', 'Buku berhasil diubah.');
     }
 
-
+    /**
+     * Menghapus buku dari database.
+     */
     public function destroy(string $id)
     {
-        $buku = \App\Models\Buku::findOrFail($id);
+        $buku = Buku::findOrFail($id);
         $buku->delete();
+
         return redirect()->back()->with('success', 'Buku berhasil dihapus.');
     }
 }

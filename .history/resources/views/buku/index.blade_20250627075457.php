@@ -28,6 +28,7 @@
                                 </div>
                             </form>
                             @if (Auth::user()->role == 'admin')
+                                {{-- PASTIKAN LINK INI BENAR --}}
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
                                     Data</a>
@@ -70,13 +71,12 @@
                                         @if (Auth::user()->role == 'admin')
                                             <td
                                                 class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                {{-- Form untuk Hapus --}}
                                                 <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
-                                                    id="delete-form-buku-{{ $item->id }}" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
+                                                    id="delete-form-buku-{{ $item->id }}">
                                                     <a href="{{ route('buku.edit', $item->id) }}"
                                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">Edit</a>
+                                                    @csrf
+                                                    @method('DELETE')
                                                     <button type="button"
                                                         onclick="showAlert({{ $item->id }}, 'buku')"
                                                         class="ml-4 text-red-600 dark:text-red-400 hover:text-red-900">Hapus</button>
@@ -104,42 +104,6 @@
     </div>
 
     @push('scripts')
-        <style type="text/tailwindcss">
-            .swal2-popup {
-                @apply !rounded-lg !bg-white dark: !bg-gray-800;
-            }
-
-            .swal2-title {
-                @apply !text-gray-900 dark: !text-gray-200;
-            }
-
-            .swal2-html-container {
-                @apply !text-gray-600 dark: !text-gray-400;
-            }
-        </style>
-        <script>
-            function showAlert(id, module) {
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Data yang sudah dihapus tidak dapat dikembalikan!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal',
-                    customClass: {
-                        popup: 'swal2-popup',
-                        title: 'swal2-title',
-                        htmlContainer: 'swal2-html-container',
-                        confirmButton: 'rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500',
-                        cancelButton: 'ml-3 rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500'
-                    },
-                    buttonsStyling: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById(`delete-form-${module}-${id}`).submit();
-                    }
-                })
-            }
-        </script>
+        {{-- Script untuk SweetAlert2, dll --}}
     @endpush
 </x-app-layout>
