@@ -1,27 +1,9 @@
-# Pengaturan yang sudah Anda miliki (ini bagus, biarkan saja)
-* text=auto eol=lf
-
-*.blade.php diff=html
-*.css diff=css
-*.html diff=html
-*.md diff=markdown
-*.php diff=php
-
-/.github export-ignore
-CHANGELOG.md export-ignore
-.styleci.yml export-ignore
-
-
-# =======================================================
-# === ATURAN UNTUK GITHUB LINGUIST ===
-# =======================================================
-
-# Abaikan folder vendor dan node_modules dari statistik bahasa.
+# Abaikan direktori dependensi dari statistik bahasa
+# Ini adalah aturan yang paling penting dan berdampak besar
 vendor/** linguist-vendored
 node_modules/** linguist-vendored
+public/build/** linguist-vendored
 
-# Definisikan bahasa secara eksplisit untuk menghindari kesalahan.
+# Definisikan bahasa file secara eksplisit untuk keakuratan
 *.php linguist-language=PHP
 *.blade.php linguist-language=Blade
-composer.lock linguist-language=JSON
-package-lock.json linguist-language=JSON
