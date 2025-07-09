@@ -1,3 +1,4 @@
+# Pengaturan yang sudah Anda miliki (biarkan saja)
 * text=auto eol=lf
 
 *.blade.php diff=html
@@ -9,3 +10,19 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+
+# =======================================================
+# === TAMBAHKAN KODE DI BAWAH INI UNTUK PERBAIKI BAHASA ===
+# =======================================================
+
+# Abaikan folder vendor dan node_modules dari statistik bahasa.
+# Ini adalah langkah yang paling berpengaruh.
+vendor/** linguist-vendored
+node_modules/** linguist-vendored
+
+# Secara eksplisit tandai file .php sebagai bahasa PHP untuk menghindari keraguan.
+*.php linguist-language=PHP
+
+# Anda juga bisa menandai Blade sebagai HTML jika diperlukan
+# *.blade.php linguist-language=HTML
