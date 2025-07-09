@@ -1,4 +1,4 @@
-# Pengaturan yang sudah Anda miliki (biarkan saja)
+# Pengaturan yang sudah Anda miliki (ini bagus, biarkan saja)
 * text=auto eol=lf
 
 *.blade.php diff=html
@@ -13,16 +13,15 @@ CHANGELOG.md export-ignore
 
 
 # =======================================================
-# === TAMBAHKAN KODE DI BAWAH INI UNTUK PERBAIKI BAHASA ===
+# === ATURAN UNTUK GITHUB LINGUIST ===
 # =======================================================
 
 # Abaikan folder vendor dan node_modules dari statistik bahasa.
-# Ini adalah langkah yang paling berpengaruh.
 vendor/** linguist-vendored
 node_modules/** linguist-vendored
 
-# Secara eksplisit tandai file .php sebagai bahasa PHP untuk menghindari keraguan.
+# Definisikan bahasa secara eksplisit untuk menghindari kesalahan.
 *.php linguist-language=PHP
-
-# Anda juga bisa menandai Blade sebagai HTML jika diperlukan
-# *.blade.php linguist-language=HTML
+*.blade.php linguist-language=Blade
+composer.lock linguist-language=JSON
+package-lock.json linguist-language=JSON
