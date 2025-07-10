@@ -1,9 +1,6 @@
-# Abaikan direktori dependensi dari statistik bahasa
-# Ini adalah aturan yang paling penting dan berdampak besar
 vendor/** linguist-vendored
 node_modules/** linguist-vendored
 public/build/** linguist-vendored
 
-# Definisikan bahasa file secara eksplisit untuk keakuratan
 *.php linguist-language=PHP
 *.blade.php linguist-language=Blade
