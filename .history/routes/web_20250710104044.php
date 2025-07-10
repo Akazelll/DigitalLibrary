@@ -4,18 +4,24 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
+// Import semua Controller
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PenerbitController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\LaporanController;
 
+// Import semua Model
 use App\Models\User;
 use App\Models\Penerbit;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
@@ -53,15 +59,19 @@ Route::get('/dashboard', function () {
 
 
 Route::middleware('auth')->group(function () {
-
+    // Rute profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // === RUTE APLIKASI PERPUSTAKAAN ===
+
+    // Rute yang bisa diakses SEMUA user login
     Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
 
+    // Grup rute yang HANYA bisa diakses oleh ADMIN
     Route::middleware('is.admin')->group(function () {
-
+        // Rute CRUD untuk Penerbit dan Peminjaman
         Route::resource('penerbit', PenerbitController::class)->except(['show']);
         Route::resource('peminjaman', PeminjamanController::class)->except(['show', 'destroy']);
 

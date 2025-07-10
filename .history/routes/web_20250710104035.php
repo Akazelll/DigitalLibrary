@@ -4,18 +4,24 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
+// Import semua Controller
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PenerbitController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\LaporanController;
 
+// Import semua Model
 use App\Models\User;
 use App\Models\Penerbit;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
@@ -53,24 +59,31 @@ Route::get('/dashboard', function () {
 
 
 Route::middleware('auth')->group(function () {
-
+    // Rute profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // === RUTE APLIKASI PERPUSTAKAAN ===
+
+    // Rute yang bisa diakses SEMUA user login
     Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
 
+    // Grup rute yang HANYA bisa diakses oleh ADMIN
     Route::middleware('is.admin')->group(function () {
-
+        // Rute CRUD untuk Penerbit dan Peminjaman
         Route::resource('penerbit', PenerbitController::class)->except(['show']);
         Route::resource('peminjaman', PeminjamanController::class)->except(['show', 'destroy']);
 
+        // Rute CRUD untuk Buku yang khusus Admin
+        // PENTING: Rute 'create' didefinisikan SEBELUM rute dinamis '{buku}'
         Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
         Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
         Route::get('/buku/{buku}/edit', [BukuController::class, 'edit'])->name('buku.edit');
         Route::put('/buku/{buku}', [BukuController::class, 'update'])->name('buku.update');
         Route::delete('/buku/{buku}', [BukuController::class, 'destroy'])->name('buku.destroy');
 
+        // Rute untuk Laporan
         Route::get('/laporan/peminjaman/cetak', [LaporanController::class, 'cetakPeminjaman'])->name('laporan.peminjaman.cetak');
     });
 

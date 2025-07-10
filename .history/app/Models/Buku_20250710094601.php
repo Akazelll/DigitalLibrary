@@ -10,7 +10,7 @@ class Buku extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'buku';
-    protected $fillable = ['judul_buku', 'id_penerbit', 'tahun_terbit', 'jml_halaman', 'stok'];
+    protected $fillable = ['judul_buku', 'id_penerbit', 'tahun_terbit', 'jml_halaman', ''];
 
     public function penerbit()
     {

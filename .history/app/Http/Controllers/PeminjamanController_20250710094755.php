@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\User;
 use App\Models\Buku;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB; // <-- 1. TAMBAHKAN INI
 
 class PeminjamanController extends Controller
 {
-    // The __construct() method has been removed as middleware is handled in web.php
-
-    public function index()
+    public function __construct()
     {
-        $peminjaman = Peminjaman::with(['user', 'buku'])->latest('tgl_pinjam')->paginate(10);
-        return view('peminjaman.index', compact('peminjaman'));
+        $this->middleware(['auth', 'is.admin']);
     }
+
+    // ... method index() ...
 
     public function create()
     {
-        $users = User::all();
-        $buku = Buku::where('stok', '>', 0)->get();
-        return view('peminjaman.create', compact('users', 'buku'));
+        $data['users'] = User::all();
+        // 2. HANYA TAMPILKAN BUKU YANG STOKNYA LEBIH DARI 0
+        $data['buku'] = Buku::where('stok', '>', 0)->get();
+        return view('peminjaman.create', $data);
     }
 
     public function store(Request $request)
@@ -33,12 +33,9 @@ class PeminjamanController extends Controller
             'tgl_pinjam' => 'required|date',
         ]);
 
-        $buku = Buku::findOrFail($request->id_buku);
-        if ($buku->stok < 1) {
-            return redirect()->back()->withErrors(['id_buku' => 'Stok buku ini telah habis.'])->withInput();
-        }
-
-        DB::transaction(function () use ($request, $buku) {
+        // 3. GUNAKAN DATABASE TRANSACTION
+        DB::transaction(function () use ($request) {
+            // Buat data peminjaman baru
             Peminjaman::create([
                 'id_user' => $request->id_user,
                 'id_buku' => $request->id_buku,
@@ -46,33 +43,32 @@ class PeminjamanController extends Controller
                 'status' => 'pinjam'
             ]);
 
+            // Kurangi stok buku yang dipinjam
+            $buku = Buku::find($request->id_buku);
             $buku->decrement('stok');
         });
 
-        return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman berhasil ditambahkan.');
+        return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman berhasil ditambahkan');
     }
 
     public function edit(string $id)
     {
+        // 4. GUNAKAN DATABASE TRANSACTION
         DB::transaction(function () use ($id) {
             $peminjaman = Peminjaman::findOrFail($id);
 
+            // Ubah status dan isi tanggal kembali
             $peminjaman->status = 'kembali';
             $peminjaman->tgl_kembali = now();
             $peminjaman->save();
 
+            // Tambah kembali stok buku yang dikembalikan
             $buku = Buku::find($peminjaman->id_buku);
-            if ($buku) {
+            if ($buku) { // Pastikan buku masih ada
                 $buku->increment('stok');
             }
         });
 
-        return redirect()->back()->with('success', 'Buku telah berhasil dikembalikan.');
+        return redirect()->back()->with('success', 'Buku telah berhasil dikembalikan');
     }
-
-    public function show(string $id) {}
-
-    public function update(Request $request, string $id) {}
-
-    public function destroy(string $id) {}
 }

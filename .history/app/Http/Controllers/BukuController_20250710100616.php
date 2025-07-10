@@ -12,7 +12,7 @@ class BukuController extends Controller
     {
         // Daftar kolom yang bisa diurutkan untuk keamanan
         $sortableColumns = ['judul_buku', 'tahun_terbit', 'stok', 'created_at'];
-
+        
         // Ambil parameter sorting dari URL, dengan nilai default
         $sortBy = in_array($request->query('sort_by'), $sortableColumns) ? $request->query('sort_by') : 'created_at';
         $sortDirection = in_array($request->query('sort_direction'), ['asc', 'desc']) ? $request->query('sort_direction') : 'desc';
@@ -22,9 +22,9 @@ class BukuController extends Controller
         $buku = Buku::with('penerbit')
             ->when($search, function ($query, $search) {
                 return $query->where('judul_buku', 'like', "%{$search}%")
-                    ->orWhereHas('penerbit', function ($q) use ($search) {
-                        $q->where('nama_penerbit', 'like', "%{$search}%");
-                    });
+                             ->orWhereHas('penerbit', function ($q) use ($search) {
+                                 $q->where('nama_penerbit', 'like', "%{$search}%");
+                             });
             })
             ->orderBy($sortBy, $sortDirection) // Terapkan pengurutan
             ->paginate(10) // Terapkan pagination

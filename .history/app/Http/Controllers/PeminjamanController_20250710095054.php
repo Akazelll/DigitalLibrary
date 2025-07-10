@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
-    // The __construct() method has been removed as middleware is handled in web.php
+    public function __construct()
+    {
+        $this->middleware(['auth', 'is.admin']);
+    }
 
     public function index()
     {
