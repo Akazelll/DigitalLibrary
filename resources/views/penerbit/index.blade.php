@@ -10,16 +10,18 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    {{-- Konten Utama Halaman --}}
-                    <div class="sm:flex sm:items-center mb-6">
+                    {{-- Header dengan Judul dan Tombol Tambah --}}
+                    <div class="sm:flex sm:items-center justify-between mb-6">
                         <div class="sm:flex-auto">
-                            <p class="text-sm text-gray-700 dark:text-gray-300">Berikut adalah daftar semua penerbit yang
+                            <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Daftar Penerbit
+                            </h2>
+                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-400">Kelola semua data penerbit yang
                                 terdaftar.</p>
                         </div>
-                        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                             <a href="{{ route('penerbit.create') }}"
-                                class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Tambah
-                                Data</a>
+                                class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
+                                Penerbit</a>
                         </div>
                     </div>
 
@@ -30,61 +32,40 @@
                         </div>
                     @endif
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col"
-                                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">
-                                        No</th>
-                                    <th scope="col"
-                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">
-                                        Nama Penerbit</th>
-                                    <th scope="col"
-                                        class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold text-gray-900 dark:text-gray-200">
-                                        Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                                @forelse ($penerbit as $item)
-                                    <tr>
-                                        {{-- PERBAIKAN PENOMORAN UNTUK PAGINATION --}}
-                                        <td
-                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200 sm:pl-6">
-                                            {{ $penerbit->firstItem() + $loop->index }}
-                                        </td>
-                                        <td
-                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $item->nama_penerbit }}
-                                        </td>
-                                        <td
-                                            class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                            <form action="{{ route('penerbit.destroy', $item->id) }}" method="POST"
-                                                id="delete-form-penerbit-{{ $item->id }}">
-                                                <a href="{{ route('penerbit.edit', $item->id) }}"
-                                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">Edit</a>
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button"
-                                                    onclick="showAlert({{ $item->id }}, 'penerbit')"
-                                                    class="ml-4 text-red-600 dark:text-red-400 hover:text-red-900">Hapus</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3"
-                                            class="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">Data
-                                            belum tersedia.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    {{-- ======================================================= --}}
+                    {{-- === TAMPILAN BARU: GRID KARTU PENERBIT (RESPONSIF) === --}}
+                    {{-- ======================================================= --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        @forelse ($penerbit as $item)
+                            <div
+                                class="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4 transition-transform duration-300 hover:-translate-y-1">
+                                <div>
+                                    <p class="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                                        title="{{ $item->nama_penerbit }}">
+                                        {{ $item->nama_penerbit }}
+                                    </p>
+                                </div>
+                                <div
+                                    class="mt-4 pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700">
+                                    <a href="{{ route('penerbit.edit', $item) }}"
+                                        class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Edit</a>
+                                    <form action="{{ route('penerbit.destroy', $item->id) }}" method="POST"
+                                        id="delete-form-penerbit-{{ $item->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" onclick="showAlert({{ $item->id }}, 'penerbit')"
+                                            class="w-full rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Hapus</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-span-full text-center text-gray-500 py-10">
+                                <p>Data penerbit belum tersedia.</p>
+                            </div>
+                        @endforelse
                     </div>
 
-                    {{-- ============================================= --}}
-                    {{-- === KODE PAGINATION DITARUH DI SINI === --}}
-                    {{-- ============================================= --}}
+                    {{-- Pagination Links --}}
                     <div class="mt-6">
                         {{ $penerbit->links() }}
                     </div>
@@ -94,22 +75,37 @@
         </div>
     </div>
 
-    {{-- Script untuk SweetAlert --}}
     @push('scripts')
+        <style type="text/tailwindcss">
+            .swal2-popup {
+                @apply !rounded-lg !bg-white dark: !bg-gray-800;
+            }
+
+            .swal2-title {
+                @apply !text-gray-900 dark: !text-gray-200;
+            }
+
+            .swal2-html-container {
+                @apply !text-gray-600 dark: !text-gray-400;
+            }
+        </style>
         <script>
             function showAlert(id, module) {
-                const isDarkMode = document.documentElement.classList.contains('dark');
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     text: "Data yang sudah dihapus tidak dapat dikembalikan!",
                     icon: 'warning',
-                    background: isDarkMode ? '#1f2937' : '#fff',
-                    color: isDarkMode ? '#d1d5db' : '#111827',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'swal2-popup',
+                        title: 'swal2-title',
+                        htmlContainer: 'swal2-html-container',
+                        confirmButton: 'rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500',
+                        cancelButton: 'ml-3 rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500'
+                    },
+                    buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById(`delete-form-${module}-${id}`).submit();

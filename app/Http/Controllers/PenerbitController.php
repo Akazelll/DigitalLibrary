@@ -12,7 +12,7 @@ class PenerbitController extends Controller
      */
     public function index()
     {
-        $penerbit = \App\Models\Penerbit::latest()->paginate(10);
+        $penerbit = \App\Models\Penerbit::latest()->paginate(12);
 
         return view('penerbit.index', compact('penerbit'));
     }

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Data Buku') }}
+            {{ __('Koleksi Buku') }}
         </h2>
     </x-slot>
 
@@ -13,11 +13,12 @@
                     {{-- Header dengan Form Pencarian dan Tombol Tambah --}}
                     <div class="sm:flex sm:items-center justify-between mb-6">
                         <div class="sm:flex-auto">
-                            <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Data Buku</h2>
-                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">Daftar semua buku yang tersedia di
-                                perpustakaan.</p>
+                            <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Koleksi Buku
+                            </h2>
+                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-400">Telusuri semua buku yang tersedia
+                                di perpustakaan.</p>
                         </div>
-                        <div class="mt-4 sm:mt-0 sm:ml-16 flex flex-col sm:flex-row gap-4">
+                        <div class="mt-4 sm:mt-0 flex items-center gap-4">
                             <form action="{{ route('buku.index') }}" method="GET">
                                 <div class="flex rounded-md shadow-sm">
                                     <input type="text" name="search" id="search"
@@ -30,7 +31,7 @@
                             @if (Auth::user()->role == 'admin')
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
-                                    Data</a>
+                                    Buku</a>
                             @endif
                         </div>
                     </div>
@@ -42,119 +43,72 @@
                         </div>
                     @endif
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold sm:pl-6">No</th>
-
-                                    {{-- Header Judul Buku (Sortable) --}}
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">
-                                        <a href="{{ route('buku.index', array_merge(request()->query(), ['sort_by' => 'judul_buku', 'sort_direction' => $sortBy == 'judul_buku' && $sortDirection == 'asc' ? 'desc' : 'asc'])) }}"
-                                            class="inline-flex items-center gap-2 group">
-                                            <span>Judul Buku</span>
-                                            @if ($sortBy == 'judul_buku')
-                                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                    @if ($sortDirection == 'asc')
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                                                    @else
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                                    @endif
-                                                </svg>
-                                            @endif
-                                        </a>
-                                    </th>
-
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Penerbit</th>
-
-                                    {{-- Header Tahun (Sortable) --}}
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">
-                                        <a href="{{ route('buku.index', array_merge(request()->query(), ['sort_by' => 'tahun_terbit', 'sort_direction' => $sortBy == 'tahun_terbit' && $sortDirection == 'asc' ? 'desc' : 'asc'])) }}"
-                                            class="inline-flex items-center gap-2 group">
-                                            <span>Tahun</span>
-                                            @if ($sortBy == 'tahun_terbit')
-                                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                    @if ($sortDirection == 'asc')
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                                                    @else
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                                    @endif
-                                                </svg>
-                                            @endif
-                                        </a>
-                                    </th>
-
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Halaman</th>
-
-                                    {{-- Header Stok (Sortable) --}}
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">
-                                        <a href="{{ route('buku.index', array_merge(request()->query(), ['sort_by' => 'stok', 'sort_direction' => $sortBy == 'stok' && $sortDirection == 'asc' ? 'desc' : 'asc'])) }}"
-                                            class="inline-flex items-center gap-2 group">
-                                            <span>Stok</span>
-                                            @if ($sortBy == 'stok')
-                                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                    @if ($sortDirection == 'asc')
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                                                    @else
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                                    @endif
-                                                </svg>
-                                            @endif
-                                        </a>
-                                    </th>
-
-                                    @if (Auth::user()->role == 'admin')
-                                        <th class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold">
-                                            Aksi</th>
+                    {{-- TAMPILAN GRID KARTU BUKU --}}
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
+                        @forelse ($buku as $item)
+                            <div
+                                class="relative flex flex-col bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4 transition-transform duration-300 hover:-translate-y-1">
+                                {{-- Gambar Sampul --}}
+                                {{-- ======================================================================= --}}
+                                {{-- === PERUBAHAN DI SINI: Menggunakan aspect-[2/3] untuk rasio buku === --}}
+                                {{-- ======================================================================= --}}
+                                <div
+                                    class="aspect-[2/3] w-full overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-4">
+                                    @if ($item->sampul)
+                                        <img src="{{ asset('storage/' . $item->sampul) }}"
+                                            alt="Sampul {{ $item->judul_buku }}"
+                                            class="h-full w-full object-cover object-center">
+                                    @else
+                                        <div class="h-full w-full flex items-center justify-center text-gray-400">
+                                            <svg class="w-12 h-12" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                                            </svg>
+                                        </div>
                                     @endif
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-white dark:bg-gray-900">
-                                @forelse ($buku as $item)
-                                    <tr>
-                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-6">
-                                            {{ $buku->firstItem() + $loop->index }}</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">{{ $item->judul_buku }}</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                            {{ $item->penerbit->nama_penerbit }}</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">{{ $item->tahun_terbit }}</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">{{ $item->jml_halaman }}</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">{{ $item->stok }}</td>
-                                        @if (Auth::user()->role == 'admin')
-                                            <td
-                                                class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
-                                                    id="delete-form-buku-{{ $item->id }}">
-                                                    <a href="{{ route('buku.edit', $item->id) }}"
-                                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">Edit</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button"
-                                                        onclick="showAlert({{ $item->id }}, 'buku')"
-                                                        class="ml-4 text-red-600 dark:text-red-400 hover:text-red-900">Hapus</button>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="{{ Auth::user()->role == 'admin' ? 7 : 6 }}"
-                                            class="px-3 py-4 text-sm text-center">Data belum tersedia.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </div>
+
+                                {{-- Detail Buku --}}
+                                <div class="flex flex-col flex-1">
+                                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
+                                        {{ $item->judul_buku }}</h3>
+                                    <p class="mt-1 text-sm text-gray-500 truncate">{{ $item->penerbit->nama_penerbit }}
+                                    </p>
+
+                                    <div class="mt-2 flex justify-between text-xs text-gray-500">
+                                        <span>Tahun: {{ $item->tahun_terbit }}</span>
+                                        <span>{{ $item->jml_halaman }} hal.</span>
+                                    </div>
+
+                                    <p class="mt-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">Stok:
+                                        {{ $item->stok }}</p>
+
+                                    {{-- Tombol Aksi untuk Admin --}}
+                                    @if (Auth::user()->role == 'admin')
+                                        <div
+                                            class="mt-auto pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 mt-4">
+                                            <a href="{{ route('buku.edit', $item) }}"
+                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-green-600 hover:bg-gray-50 dark:hover:bg-green-600">Edit</a>
+                                            <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
+                                                id="delete-form-buku-{{ $item->id }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="showAlert({{ $item->id }}, 'buku')"
+                                                    class="rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-red-500">Hapus</button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-span-full text-center text-gray-500 py-10">
+                                <p>Tidak ada buku yang ditemukan.</p>
+                            </div>
+                        @endforelse
                     </div>
 
+                    {{-- Pagination Links --}}
                     <div class="mt-6">
                         {{ $buku->appends(request()->query())->links() }}
                     </div>
@@ -166,21 +120,27 @@
 
     @push('scripts')
         <script>
-            function showAlert(id, type) {
-                event.preventDefault();
-                const form = document.getElementById(`delete-form-${type}-${id}`);
+            function showAlert(id, module) {
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
-                    text: "Data ini akan dihapus secara permanen!",
+                    text: "Data yang sudah dihapus tidak dapat dikembalikan!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal'
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'swal2-popup',
+                        title: 'swal2-title',
+                        htmlContainer: 'swal2-html-container',
+                        confirmButton: 'rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500',
+                        cancelButton: 'ml-3 rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500'
+                    },
+                    buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit();
+                        document.getElementById(`delete-form-${module}-${id}`).submit();
                     }
-                });
+                })
             }
         </script>
     @endpush

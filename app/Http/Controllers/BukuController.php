@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Penerbit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BukuController extends Controller
 {
@@ -26,11 +27,10 @@ class BukuController extends Controller
                         $q->where('nama_penerbit', 'like', "%{$search}%");
                     });
             })
-            ->orderBy($sortBy, $sortDirection) // Terapkan pengurutan
-            ->paginate(10) // Terapkan pagination
-            ->withQueryString(); // Agar parameter search & sort tetap ada di link pagination
+            ->orderBy($sortBy, $sortDirection)
+            ->paginate(10)
+            ->withQueryString();
 
-        // Kirim semua variabel yang dibutuhkan ke view
         return view('buku.index', compact('buku', 'sortBy', 'sortDirection'));
     }
 
@@ -48,15 +48,22 @@ class BukuController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'judul_buku'    => 'required|string|max:255',
             'id_penerbit'   => 'required|exists:penerbit,id',
             'tahun_terbit'  => 'required|digits:4|integer|min:1900',
             'jml_halaman'   => 'required|integer|min:1',
-            'stok'          => 'required|integer|min:0'
+            'stok'          => 'required|integer|min:0',
+            'sampul'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048' // Validasi untuk gambar
         ]);
 
-        Buku::create($request->all());
+        if ($request->hasFile('sampul')) {
+            // Simpan gambar dan dapatkan path-nya
+            $path = $request->file('sampul')->store('sampul_buku', 'public');
+            $validatedData['sampul'] = $path;
+        }
+
+        Buku::create($validatedData);
 
         return redirect()->route('buku.index')->with('success', 'Buku berhasil disimpan.');
     }
@@ -83,22 +90,29 @@ class BukuController extends Controller
      */
     public function update(Request $request, Buku $buku)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'judul_buku'    => 'required|string|max:255',
             'id_penerbit'   => 'required|exists:penerbit,id',
             'tahun_terbit'  => 'required|digits:4|integer|min:1900',
             'jml_halaman'   => 'required|integer|min:1',
-            'stok'          => 'required|integer|min:0'
+            'stok'          => 'required|integer|min:0',
+            'sampul'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
-        $buku->update($request->all());
+        if ($request->hasFile('sampul')) {
+            // Hapus gambar lama jika ada
+            if ($buku->sampul) {
+                Storage::disk('public')->delete($buku->sampul);
+            }
+            // Simpan gambar baru dan tambahkan path ke data yang divalidasi
+            $path = $request->file('sampul')->store('sampul_buku', 'public');
+            $validatedData['sampul'] = $path;
+        }
+
+        $buku->update($validatedData);
 
         return redirect()->route('buku.index')->with('success', 'Buku berhasil diubah.');
     }
-
-    /**
-     * Menghapus buku dari database (soft delete).
-     */
     public function destroy(Buku $buku)
     {
         $buku->delete();

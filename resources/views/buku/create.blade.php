@@ -10,79 +10,72 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    <form action="{{ route('buku.store') }}" method="POST" class="space-y-6">
+                    {{-- PENTING: Tambahkan enctype untuk upload file --}}
+                    <form action="{{ route('buku.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
+                        {{-- Input Judul Buku --}}
                         <div>
-                            <label for="judul_buku" class="block text-sm font-medium">Judul Buku </label>
-                            <div class="mt-1">
-                                <input type="text" name="judul_buku" id="judul_buku"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    value="{{ old('judul_buku') }}">
-                            </div>
-                            @error('judul_buku')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="judul_buku" value="Judul Buku" />
+                            <x-text-input id="judul_buku" name="judul_buku" type="text" class="mt-1 block w-full"
+                                :value="old('judul_buku')" required />
+                            <x-input-error :messages="$errors->get('judul_buku')" class="mt-2" />
                         </div>
 
+                        {{-- Dropdown Penerbit --}}
                         <div>
-                            <label for="id_penerbit" class="block text-sm font-medium">Penerbit </label>
-                            <div class="mt-1">
-                                <select id="id_penerbit" name="id_penerbit"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    <option value="">- Pilih Penerbit -</option>
-                                    @foreach ($penerbit as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ old('id_penerbit') == $item->id ? 'selected' : '' }}>
-                                            {{ $item->nama_penerbit }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('id_penerbit')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="id_penerbit" value="Penerbit" />
+                            <select id="id_penerbit" name="id_penerbit"
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <option value="">- Pilih Penerbit -</option>
+                                @foreach ($penerbit as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ old('id_penerbit') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->nama_penerbit }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('id_penerbit')" class="mt-2" />
                         </div>
 
+                        {{-- Input Tahun Terbit --}}
                         <div>
-                            <label for="tahun_terbit" class="block text-sm font-medium">Tahun Terbit </label>
-                            <div class="mt-1">
-                                <input type="number" name="tahun_terbit" id="tahun_terbit" placeholder="YYYY"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    value="{{ old('tahun_terbit') }}">
-                            </div>
-                            @error('tahun_terbit')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="tahun_terbit" value="Tahun Terbit" />
+                            <x-text-input id="tahun_terbit" name="tahun_terbit" type="number" class="mt-1 block w-full"
+                                :value="old('tahun_terbit')" placeholder="YYYY" required />
+                            <x-input-error :messages="$errors->get('tahun_terbit')" class="mt-2" />
                         </div>
 
+                        {{-- Input Jumlah Halaman --}}
                         <div>
-                            <label for="jml_halaman" class="block text-sm font-medium">Jumlah Halaman</label>
-                            <div class="mt-1">
-                                <input type="number" name="jml_halaman" id="jml_halaman"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                    value="{{ old('jml_halaman') }}">
-                            </div>
-                            @error('jml_halaman')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="jml_halaman" value="Jumlah Halaman" />
+                            <x-text-input id="jml_halaman" name="jml_halaman" type="number" class="mt-1 block w-full"
+                                :value="old('jml_halaman')" required />
+                            <x-input-error :messages="$errors->get('jml_halaman')" class="mt-2" />
                         </div>
 
+                        {{-- Input Stok Buku --}}
                         <div>
-                            <label for="stok" class="block text-sm font-medium">Stok Buku</label>
-                            <div class="mt-1">
-                                <input type="number" name="stok" id="stok"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm"
-                                    value="{{ old('stok', $buku->stok ?? 0) }}" required>
-                            </div>
-                            @error('stok')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="stok" value="Stok Buku" />
+                            <x-text-input id="stok" name="stok" type="number" class="mt-1 block w-full"
+                                :value="old('stok', 0)" required />
+                            <x-input-error :messages="$errors->get('stok')" class="mt-2" />
+                        </div>
+
+                        {{-- =============================================== --}}
+                        {{-- === BARU: Input untuk Upload Gambar Sampul === --}}
+                        {{-- =============================================== --}}
+                        <div>
+                            <x-input-label for="sampul" value="Gambar Sampul (Opsional)" />
+                            <input id="sampul" name="sampul" type="file"
+                                class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, WEBP (MAX. 2MB)</p>
+                            <x-input-error :messages="$errors->get('sampul')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end gap-x-4 pt-6">
-                            <a href="{{ route('buku.index') }}" class="text-sm font-semibold leading-6">Batal</a>
-                            <button type="submit"
-                                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Simpan</button>
+                            <a href="{{ route('buku.index') }}"
+                                class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-300">Batal</a>
+                            <x-primary-button>{{ __('Simpan') }}</x-primary-button>
                         </div>
                     </form>
 
