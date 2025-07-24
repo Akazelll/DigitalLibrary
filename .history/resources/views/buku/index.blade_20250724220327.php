@@ -31,7 +31,7 @@
                             @if (Auth::user()->role == 'admin')
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
-                                    Buku</a>
+                                    Data</a>
                             @endif
                         </div>
                     </div>

@@ -31,7 +31,7 @@
                             @if (Auth::user()->role == 'admin')
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
-                                    Buku</a>
+                                    Data</a>
                             @endif
                         </div>
                     </div>
@@ -89,13 +89,13 @@
                                         <div
                                             class="mt-auto pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 mt-4">
                                             <a href="{{ route('buku.edit', $item) }}"
-                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-green-600 hover:bg-gray-50 dark:hover:bg-green-600">Edit</a>
+                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring--600 hover:bg-gray-50 dark:hover:bg-gray-600">Edit</a>
                                             <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
                                                 id="delete-form-buku-{{ $item->id }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" onclick="showAlert({{ $item->id }}, 'buku')"
-                                                    class="rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-red-500">Hapus</button>
+                                                    class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Hapus</button>
                                             </form>
                                         </div>
                                     @endif

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Penerbit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BukuController extends Controller
 {

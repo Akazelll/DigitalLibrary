@@ -31,7 +31,7 @@
                             @if (Auth::user()->role == 'admin')
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
-                                    Buku</a>
+                                    Data</a>
                             @endif
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" onclick="showAlert({{ $item->id }}, 'buku')"
-                                                    class="rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-red-500">Hapus</button>
+                                                    class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-gray-50 dark:hover:bg-red-600">Hapus</button>
                                             </form>
                                         </div>
                                     @endif

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Penerbit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BukuController extends Controller
 {
@@ -90,7 +89,7 @@ class BukuController extends Controller
      */
     public function update(Request $request, Buku $buku)
     {
-        $validatedData = $request->validate([
+        $$validatedData = $request->validate([
             'judul_buku'    => 'required|string|max:255',
             'id_penerbit'   => 'required|exists:penerbit,id',
             'tahun_terbit'  => 'required|digits:4|integer|min:1900',
@@ -104,7 +103,7 @@ class BukuController extends Controller
             if ($buku->sampul) {
                 Storage::disk('public')->delete($buku->sampul);
             }
-            // Simpan gambar baru dan tambahkan path ke data yang divalidasi
+            // Simpan gambar baru
             $path = $request->file('sampul')->store('sampul_buku', 'public');
             $validatedData['sampul'] = $path;
         }
@@ -113,6 +112,10 @@ class BukuController extends Controller
 
         return redirect()->route('buku.index')->with('success', 'Buku berhasil diubah.');
     }
+
+    /**
+     * Menghapus buku dari database (soft delete).
+     */
     public function destroy(Buku $buku)
     {
         $buku->delete();

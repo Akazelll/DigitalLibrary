@@ -31,7 +31,7 @@
                             @if (Auth::user()->role == 'admin')
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
-                                    Buku</a>
+                                    Data</a>
                             @endif
                         </div>
                     </div>
@@ -43,17 +43,16 @@
                         </div>
                     @endif
 
-                    {{-- TAMPILAN GRID KARTU BUKU --}}
+                    {{-- ======================================================= --}}
+                    {{-- === TAMPILAN BARU: GRID KARTU BUKU (RESPONSIF) === --}}
+                    {{-- ======================================================= --}}
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
                         @forelse ($buku as $item)
                             <div
                                 class="relative flex flex-col bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4 transition-transform duration-300 hover:-translate-y-1">
                                 {{-- Gambar Sampul --}}
-                                {{-- ======================================================================= --}}
-                                {{-- === PERUBAHAN DI SINI: Menggunakan aspect-[2/3] untuk rasio buku === --}}
-                                {{-- ======================================================================= --}}
                                 <div
-                                    class="aspect-[2/3] w-full overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-4">
+                                    class="aspect-h-3 aspect-w-2 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-4">
                                     @if ($item->sampul)
                                         <img src="{{ asset('storage/' . $item->sampul) }}"
                                             alt="Sampul {{ $item->judul_buku }}"
@@ -71,7 +70,8 @@
 
                                 {{-- Detail Buku --}}
                                 <div class="flex flex-col flex-1">
-                                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
+                                    <h3
+                                        class="text-sm font-semibold text-gray-900 dark:text-white leading-tight truncate">
                                         {{ $item->judul_buku }}</h3>
                                     <p class="mt-1 text-sm text-gray-500 truncate">{{ $item->penerbit->nama_penerbit }}
                                     </p>
@@ -89,13 +89,13 @@
                                         <div
                                             class="mt-auto pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 mt-4">
                                             <a href="{{ route('buku.edit', $item) }}"
-                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-green-600 hover:bg-gray-50 dark:hover:bg-green-600">Edit</a>
+                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Edit</a>
                                             <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
                                                 id="delete-form-buku-{{ $item->id }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" onclick="showAlert({{ $item->id }}, 'buku')"
-                                                    class="rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-red-500">Hapus</button>
+                                                    class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Hapus</button>
                                             </form>
                                         </div>
                                     @endif
@@ -119,29 +119,6 @@
     </div>
 
     @push('scripts')
-        <script>
-            function showAlert(id, module) {
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Data yang sudah dihapus tidak dapat dikembalikan!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal',
-                    customClass: {
-                        popup: 'swal2-popup',
-                        title: 'swal2-title',
-                        htmlContainer: 'swal2-html-container',
-                        confirmButton: 'rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500',
-                        cancelButton: 'ml-3 rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500'
-                    },
-                    buttonsStyling: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById(`delete-form-${module}-${id}`).submit();
-                    }
-                })
-            }
-        </script>
+        {{-- Script SweetAlert Anda akan tetap berfungsi dengan kode ini --}}
     @endpush
 </x-app-layout>
