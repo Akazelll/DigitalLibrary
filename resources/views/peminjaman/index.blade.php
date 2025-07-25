@@ -59,7 +59,7 @@
                         <div class="sm:flex-auto">
                             <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Daftar
                                 Transaksi</h2>
-                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">Semua data transaksi peminjaman
+                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-400">Semua data transaksi peminjaman
                                 buku.</p>
                         </div>
                         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -76,6 +76,7 @@
                         </div>
                     @endif
 
+                    {{-- Tampilan Desktop (TABLE) --}}
                     <div class="hidden lg:block overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -84,7 +85,9 @@
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Peminjam</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Judul Buku</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Tgl Pinjam</th>
+                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Batas Waktu</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Tgl Kembali</th>
+                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Denda</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Status</th>
                                     <th class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold">Aksi
                                     </th>
@@ -92,7 +95,7 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-white dark:bg-gray-900">
                                 @forelse ($peminjaman as $item)
-                                    <tr>
+                                    <tr @if ($item->is_overdue) class="bg-red-50 dark:bg-red-900/20" @endif>
                                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-6">
                                             {{ $peminjaman->firstItem() + $loop->index }}</td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">{{ $item->user->name }}</td>
@@ -100,11 +103,21 @@
                                             {{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">
                                             {{ \Carbon\Carbon::parse($item->tgl_pinjam)->format('d-m-Y') }}</td>
+                                        <td
+                                            class="whitespace-nowrap px-3 py-4 text-sm font-medium @if ($item->is_overdue) text-red-600 dark:text-red-400 @endif">
+                                            {{ \Carbon\Carbon::parse($item->tanggal_harus_kembali)->format('d-m-Y') }}
+                                        </td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">
                                             {{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}
                                         </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm font-semibold">
+                                            Rp {{ number_format($item->denda_terhitung, 0, ',', '.') }}
+                                        </td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                            @if ($item->status == 'pinjam')
+                                            @if ($item->is_overdue)
+                                                <span
+                                                    class="inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/50 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-300 ring-1 ring-inset ring-red-600/20">Terlambat</span>
+                                            @elseif($item->status == 'pinjam')
                                                 <span
                                                     class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900/50 px-2 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20">Dipinjam</span>
                                             @else
@@ -123,7 +136,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-3 py-4 text-sm text-center">Data peminjaman belum
+                                        <td colspan="9" class="px-3 py-4 text-sm text-center">Data peminjaman belum
                                             tersedia.</td>
                                     </tr>
                                 @endforelse
@@ -131,15 +144,19 @@
                         </table>
                     </div>
 
+                    {{-- Tampilan Mobile (CARDS) --}}
                     <div class="block lg:hidden space-y-4">
                         @forelse ($peminjaman as $item)
-                            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4">
+                            <div
+                                class="bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4 @if ($item->is_overdue) ring-2 ring-red-500 @endif">
                                 <div class="flex justify-between items-start">
-                                    {{-- ================= PERBAIKAN DI SINI ================= --}}
                                     <div class="font-semibold text-gray-900 dark:text-white">
                                         {{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</div>
                                     <div>
-                                        @if ($item->status == 'pinjam')
+                                        @if ($item->is_overdue)
+                                            <span
+                                                class="inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/50 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-300 ring-1 ring-inset ring-red-600/20">Terlambat</span>
+                                        @elseif($item->status == 'pinjam')
                                             <span
                                                 class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900/50 px-2 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20">Dipinjam</span>
                                         @else
@@ -156,9 +173,20 @@
                                             class="font-medium text-gray-800 dark:text-gray-300">Tgl
                                             Pinjam:</span><span>{{ \Carbon\Carbon::parse($item->tgl_pinjam)->format('d-m-Y') }}</span>
                                     </div>
+                                    <div
+                                        class="flex justify-between @if ($item->is_overdue) text-red-600 dark:text-red-400 @endif">
+                                        <span class="font-medium text-gray-800 dark:text-gray-300">Batas
+                                            Waktu:</span><span
+                                            class="font-semibold">{{ \Carbon\Carbon::parse($item->tanggal_harus_kembali)->format('d-m-Y') }}</span>
+                                    </div>
                                     <div class="flex justify-between"><span
                                             class="font-medium text-gray-800 dark:text-gray-300">Tgl
                                             Kembali:</span><span>{{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}</span>
+                                    </div>
+                                    <div class="flex justify-between"><span
+                                            class="font-medium text-gray-800 dark:text-gray-300">Denda:</span><span
+                                            class="font-semibold">Rp
+                                            {{ number_format($item->denda_terhitung, 0, ',', '.') }}</span>
                                     </div>
                                 </div>
                                 @if ($item->status == 'pinjam')
@@ -183,7 +211,6 @@
         </div>
     </div>
 
-    {{-- Script SweetAlert --}}
     @push('scripts')
         <script>
             function showReturnAlert(url) {

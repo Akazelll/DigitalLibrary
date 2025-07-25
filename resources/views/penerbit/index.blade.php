@@ -10,7 +10,6 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    {{-- Header dengan Judul dan Tombol Tambah --}}
                     <div class="sm:flex sm:items-center justify-between mb-6">
                         <div class="sm:flex-auto">
                             <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Daftar Penerbit
@@ -31,10 +30,6 @@
                             </p>
                         </div>
                     @endif
-
-                    {{-- ======================================================= --}}
-                    {{-- === TAMPILAN BARU: GRID KARTU PENERBIT (RESPONSIF) === --}}
-                    {{-- ======================================================= --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse ($penerbit as $item)
                             <div
@@ -48,13 +43,13 @@
                                 <div
                                     class="mt-4 pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700">
                                     <a href="{{ route('penerbit.edit', $item) }}"
-                                        class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Edit</a>
+                                        class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-green-600 hover:bg-gray-50 dark:hover:bg-green-600">Edit</a>
                                     <form action="{{ route('penerbit.destroy', $item->id) }}" method="POST"
                                         id="delete-form-penerbit-{{ $item->id }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" onclick="showAlert({{ $item->id }}, 'penerbit')"
-                                            class="w-full rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Hapus</button>
+                                            class="rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-red-500">Hapus</button>
                                     </form>
                                 </div>
                             </div>
@@ -64,8 +59,6 @@
                             </div>
                         @endforelse
                     </div>
-
-                    {{-- Pagination Links --}}
                     <div class="mt-6">
                         {{ $penerbit->links() }}
                     </div>
@@ -76,19 +69,6 @@
     </div>
 
     @push('scripts')
-        <style type="text/tailwindcss">
-            .swal2-popup {
-                @apply !rounded-lg !bg-white dark: !bg-gray-800;
-            }
-
-            .swal2-title {
-                @apply !text-gray-900 dark: !text-gray-200;
-            }
-
-            .swal2-html-container {
-                @apply !text-gray-600 dark: !text-gray-400;
-            }
-        </style>
         <script>
             function showAlert(id, module) {
                 Swal.fire({

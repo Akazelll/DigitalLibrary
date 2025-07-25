@@ -30,6 +30,9 @@
                             <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
                                 {{ __('Peminjaman') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('kategori.index')" :active="request()->routeIs('kategori.*')">
+                                {{ __('Kategori') }}
+                            </x-nav-link>
                         @endif
                     @endauth
                 </div>
@@ -94,6 +97,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
                         {{ __('Peminjaman') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('kategori.index')" :active="request()->routeIs('kategori.*')">
+                        {{ __('Kategori') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth

@@ -43,6 +43,7 @@ class PeminjamanController extends Controller
                 'id_user' => $request->id_user,
                 'id_buku' => $request->id_buku,
                 'tgl_pinjam' => $request->tgl_pinjam,
+                'tanggal_harus_kembali' => \Carbon\Carbon::parse($request->tgl_pinjam)->addDays(7),
                 'status' => 'pinjam'
             ]);
 
@@ -57,8 +58,22 @@ class PeminjamanController extends Controller
         DB::transaction(function () use ($id) {
             $peminjaman = Peminjaman::findOrFail($id);
 
+            $denda = 0;
+
+            if ($peminjaman->is_overdue) {
+                $tanggalHarusKembali = \Carbon\Carbon::parse($peminjaman->tanggal_harus_kembali);
+                $tanggalKembali = now();
+ 
+                $hariTerlambat = $tanggalKembali->diffInDays($tanggalHarusKembali);
+
+                if ($hariTerlambat > 0) {
+                    $denda = $hariTerlambat * Peminjaman::DENDA_PER_HARI;
+                }
+            }
+
             $peminjaman->status = 'kembali';
             $peminjaman->tgl_kembali = now();
+            $peminjaman->denda = $denda;
             $peminjaman->save();
 
             $buku = Buku::find($peminjaman->id_buku);

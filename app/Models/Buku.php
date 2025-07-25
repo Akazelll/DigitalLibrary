@@ -10,10 +10,15 @@ class Buku extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'buku';
-    protected $fillable = ['judul_buku', 'id_penerbit', 'tahun_terbit', 'jml_halaman', 'stok', 'sampul'];
+    protected $fillable = ['judul_buku', 'id_penerbit', 'kategori_id', 'tahun_terbit', 'jml_halaman', 'stok', 'sampul'];
 
     public function penerbit()
     {
         return $this->belongsTo(Penerbit::class, 'id_penerbit');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 }

@@ -10,7 +10,6 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    {{-- Header dengan Form Pencarian dan Tombol Tambah --}}
                     <div class="sm:flex sm:items-center justify-between mb-6">
                         <div class="sm:flex-auto">
                             <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Koleksi Buku
@@ -43,15 +42,10 @@
                         </div>
                     @endif
 
-                    {{-- TAMPILAN GRID KARTU BUKU --}}
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
                         @forelse ($buku as $item)
                             <div
                                 class="relative flex flex-col bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4 transition-transform duration-300 hover:-translate-y-1">
-                                {{-- Gambar Sampul --}}
-                                {{-- ======================================================================= --}}
-                                {{-- === PERUBAHAN DI SINI: Menggunakan aspect-[2/3] untuk rasio buku === --}}
-                                {{-- ======================================================================= --}}
                                 <div
                                     class="aspect-[2/3] w-full overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-4">
                                     @if ($item->sampul)
@@ -69,7 +63,6 @@
                                     @endif
                                 </div>
 
-                                {{-- Detail Buku --}}
                                 <div class="flex flex-col flex-1">
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
                                         {{ $item->judul_buku }}</h3>
@@ -84,7 +77,6 @@
                                     <p class="mt-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">Stok:
                                         {{ $item->stok }}</p>
 
-                                    {{-- Tombol Aksi untuk Admin --}}
                                     @if (Auth::user()->role == 'admin')
                                         <div
                                             class="mt-auto pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 mt-4">
@@ -107,11 +99,21 @@
                             </div>
                         @endforelse
                     </div>
-
-                    {{-- Pagination Links --}}
                     <div class="mt-6">
                         {{ $buku->appends(request()->query())->links() }}
                     </div>
+                    @if (request('kategori'))
+                        <div
+                            class="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/50 rounded-lg flex items-center justify-between">
+                            <p class="text-sm text-indigo-800 dark:text-indigo-200">
+                                Menampilkan buku untuk kategori: <span
+                                    class="font-bold">{{ request('kategori') }}</span>
+                            </p>
+                            <a href="{{ route('buku.index') }}"
+                                class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">&times; Hapus
+                                Filter</a>
+                        </div>
+                    @endif
 
                 </div>
             </div>

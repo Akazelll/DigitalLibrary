@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -7,140 +7,137 @@
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11px;
             color: #333;
         }
 
-        .header-table,
+        @page {
+            margin: 100px 40px 50px 40px;
+        }
+
+        header {
+            position: fixed;
+            top: -80px;
+            left: 0px;
+            right: 0px;
+            height: 60px;
+            text-align: center;
+        }
+
+        footer {
+            position: fixed;
+            bottom: -30px;
+            left: 0px;
+            right: 0px;
+            height: 40px;
+            font-size: 9px;
+            color: #888;
+            text-align: center;
+        }
+
+        .page-number:before {
+            content: "Halaman " counter(page);
+        }
+
+        .report-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .report-subtitle {
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        .report-period {
+            font-size: 11px;
+            margin-top: 2px;
+            color: #555;
+        }
+
         .main-table {
             width: 100%;
             border-collapse: collapse;
-        }
-
-        .header-table td {
-            padding: 0;
-            vertical-align: middle;
+            margin-top: 20px;
         }
 
         .main-table th,
         .main-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
+            border: 1px solid #000;
+            padding: 8px;
             text-align: left;
-            font-size: 12px;
         }
 
         .main-table thead th {
-            background-color: #4F46E5;
-            /* Warna Indigo */
-            color: white;
+            background-color: #EFEFEF;
+            color: #000;
             font-weight: bold;
             text-align: center;
-        }
-
-        .main-table tbody tr:nth-child(even) {
-            background-color: #f5f5f5;
+            vertical-align: middle;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .text-right {
-            text-align: right;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .sub-header {
-            font-size: 14px;
-            margin-top: 5px;
-            color: #555;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            height: 50px;
+        .no-data {
             text-align: center;
-            font-size: 10px;
+            font-style: italic;
             color: #777;
-        }
-
-        .page-number:before {
-            content: "Halaman " counter(page);
+            padding: 20px;
         }
     </style>
 </head>
 
 <body>
+    <!-- FOOTER -->
+    <footer>
+        Laporan ini dicetak secara otomatis oleh Sistem DigiPustaka pada
+        {{ \Carbon\Carbon::now('Asia/Jakarta')->isoFormat('D MMMM Y, HH:mm') }} | <span class="page-number"></span>
+    </footer>
 
-    <table class="header-table">
-        <tr>
-            <td style="width: 60px;">
-                {{-- Logo Aplikasi --}}
-                <svg class="logo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="#4F46E5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                </svg>
-            </td>
-            <td>
-                <h1>DigiPustaka</h1>
-                <p class="sub-header">Laporan Peminjaman Buku</p>
-            </td>
-            <td class="text-right">
-                <p><strong>Periode:</strong> {{ \Carbon\Carbon::parse($tanggalAwal)->isoFormat('D MMMM Y') }}<br>
-                    s/d {{ \Carbon\Carbon::parse($tanggalAkhir)->isoFormat('D MMMM Y') }}</p>
-            </td>
-        </tr>
-    </table>
+    <!-- HEADER (KOP SURAT) -->
+    <header>
+        <p class="report-title">DigiPustaka</p>
+        <p class="report-subtitle">Laporan Transaksi Peminjaman Buku</p>
+        <p class="report-period">Untuk Periode yang Berakhir pada
+            {{ \Carbon\Carbon::parse($tanggalAkhir)->isoFormat('D MMMM Y') }}</p>
+    </header>
 
-    <hr style="margin-top: 20px; margin-bottom: 20px;">
-
-    <table class="main-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Peminjam</th>
-                <th>Judul Buku</th>
-                <th>Tanggal Pinjam</th>
-                <th>Tanggal Kembali</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($peminjaman as $item)
+    <!-- KONTEN UTAMA -->
+    <main>
+        <table class="main-table">
+            <thead>
                 <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $item->user->name }}</td>
-                    <td>{{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</td>
-                    <td class="text-center">{{ \Carbon\Carbon::parse($item->tgl_pinjam)->format('d-m-Y') }}</td>
-                    <td class="text-center">
-                        {{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}</td>
-                    <td class="text-center">{{ $item->status == 'pinjam' ? 'Dipinjam' : 'Kembali' }}</td>
+                    <th style="width: 5%;">No</th>
+                    <th style="width: 15%;">Tanggal Pinjam</th>
+                    <th style="width: 20%;">Peminjam</th>
+                    <th>Judul Buku</th>
+                    <th style="width: 15%;">Tanggal Kembali</th>
+                    <th style="width: 12%;">Status</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">Tidak ada data peminjaman untuk periode ini.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <div class="footer">
-        Dicetak pada: {{ \Carbon\Carbon::now('Asia/Jakarta')->isoFormat('D MMMM Y, HH:mm') }} - DigiPustaka
-    </div>
-
+            </thead>
+            <tbody>
+                @forelse ($peminjaman as $item)
+                    <tr>
+                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td class="text-center">{{ \Carbon\Carbon::parse($item->tgl_pinjam)->format('d-m-Y') }}</td>
+                        <td>{{ $item->user->name }}</td>
+                        <td>{{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</td>
+                        <td class="text-center">
+                            {{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}
+                        </td>
+                        <td class="text-center">{{ $item->status == 'pinjam' ? 'Dipinjam' : 'Kembali' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="no-data">Tidak ada data transaksi peminjaman untuk periode ini.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </main>
 </body>
 
 </html>
