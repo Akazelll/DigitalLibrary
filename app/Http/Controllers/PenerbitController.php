@@ -5,29 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Penerbit;
 use Illuminate\Http\Request;
 
+
 class PenerbitController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        $penerbit = \App\Models\Penerbit::latest()->paginate(12);
+        $penerbit = \App\Models\Penerbit::withCount('buku')
+            ->orderBy('nama_penerbit', 'asc')
+            ->paginate(12);
 
         return view('penerbit.index', compact('penerbit'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('penerbit.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -41,26 +36,19 @@ class PenerbitController extends Controller
         return redirect()->route('penerbit.index')->with('success', 'Data berhasil disimpan');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $data['penerbit'] = Penerbit::find($id);
         return view('penerbit.edit', $data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, string $id)
     {
-        // Cukup ganti "$this" menjadi "$request"
         $request->validate([
             'nama_penerbit' => 'required'
         ]);
 
-        // ... sisa kode untuk update data ...
         $penerbit = \App\Models\Penerbit::find($id);
         $penerbit->update([
             'nama_penerbit' => $request->nama_penerbit
@@ -69,14 +57,13 @@ class PenerbitController extends Controller
         return redirect()->route('penerbit.index')->with('success', 'Data berhasil diubah');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Penerbit $penerbit)
     {
-        $penerbit = Penerbit::find($id);
-        $penerbit->delete();
+        if ($penerbit->buku()->count() > 0) {
+            return redirect()->back()->withErrors(['error' => 'Penerbit tidak dapat dihapus karena masih memiliki buku.']);
+        }
 
-        return redirect()->back()->with('success', 'Data berhasil dihapus');
+        $penerbit->delete();
+        return redirect()->back()->with('success', 'Penerbit berhasil dihapus.');
     }
 }

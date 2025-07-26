@@ -123,21 +123,27 @@
     @push('scripts')
         <script>
             function showAlert(id, module) {
+                // 1. Tambahkan deteksi mode gelap
+                const isDarkMode = document.documentElement.classList.contains('dark');
+
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     text: "Data yang sudah dihapus tidak dapat dikembalikan!",
                     icon: 'warning',
+
+                    // 2. Terapkan warna latar dan teks dinamis
+                    background: isDarkMode ? '#1f2937' : '#fff',
+                    color: isDarkMode ? '#d1d5db' : '#111827',
+
                     showCancelButton: true,
+
+                    // 3. Atur warna tombol (merah untuk konfirmasi hapus)
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6e7881',
+
                     confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal',
-                    customClass: {
-                        popup: 'swal2-popup',
-                        title: 'swal2-title',
-                        htmlContainer: 'swal2-html-container',
-                        confirmButton: 'rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500',
-                        cancelButton: 'ml-3 rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500'
-                    },
-                    buttonsStyling: false
+                    cancelButtonText: 'Batal'
+
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById(`delete-form-${module}-${id}`).submit();

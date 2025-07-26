@@ -14,17 +14,17 @@
                     <h3 class="text-lg font-medium">{{ $greeting }}, {{ Auth::user()->name }}!</h3>
                     <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         @if (Auth::user()->role == 'admin')
-                            Berikut adalah ringkasan data dari aplikasi perpustakaan Anda.
+                            Berikut adalah ringkasan dan analitik dari aplikasi perpustakaan Anda.
                         @else
-                            Selamat datang di DigiPustaka. Cari dan pinjam buku favoritmu!
+                            Selamat datang di DigiPustaka. Lacak aktivitas peminjaman dan temukan buku favoritmu!
                         @endif
                     </p>
                 </div>
             </div>
 
-            {{-- ============================================= --}}
-            {{-- ============ TAMPILAN KHUSUS ADMIN ============ --}}
-            {{-- ============================================= --}}
+            {{-- ========================================================= --}}
+            {{-- ============ TAMPILAN KHUSUS UNTUK ADMIN ============ --}}
+            {{-- ========================================================= --}}
             @if (Auth::user()->role == 'admin')
 
                 <!-- Stat Cards Grid -->
@@ -120,117 +120,169 @@
 
                 <!-- Main Content Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Panel Aktivitas Terbaru (Kolom Kiri) -->
+                    <!-- Panel Grafik Peminjaman (Kolom Kiri) -->
                     <div class="lg:col-span-2 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Aktivitas
-                                Peminjaman Terbaru</h3>
-                            <div class="mt-4 flow-root">
-                                <ul role="list" class="-mb-8">
-                                    @forelse ($peminjamanTerbaru as $peminjaman)
-                                        <li>
-                                            <div class="relative pb-8">
-                                                @if (!$loop->last)
-                                                    <span
-                                                        class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700"
-                                                        aria-hidden="true"></span>
-                                                @endif
-                                                <div class="relative flex items-center space-x-3">
-                                                    <div>
-                                                        <span
-                                                            class="h-10 w-10 rounded-full bg-gray-400 dark:bg-gray-600 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
-                                                            <svg class="h-5 w-5 text-white"
-                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                                fill="currentColor">
-                                                                <path
-                                                                    d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <p class="text-sm text-gray-500">
-                                                            <span
-                                                                class="font-medium text-gray-900 dark:text-white">{{ $peminjaman->user->name }}</span>
-                                                            meminjam buku <span
-                                                                class="font-medium text-gray-900 dark:text-white">{{ $peminjaman->buku?->judul_buku ?? '[Buku Telah Dihapus]' }}</span>
-                                                        </p>
-                                                        <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                                                            {{ $peminjaman->created_at->diffForHumans() }}</p>
-                                                    </div>
-                                                </div>
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Tren
+                                Peminjaman</h3>
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Jumlah buku yang dipinjam dalam 6
+                                bulan terakhir.</p>
+                            <div class="mt-6 h-80">
+                                <canvas id="loanChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Analitik Samping (Kolom Kanan) -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Buku Terpopuler -->
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Buku
+                                    Terpopuler</h3>
+                                <ul role="list" class="mt-4 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse ($bukuPopuler as $buku)
+                                        <li class="py-3 flex">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                    {{ $buku->judul_buku }}</p>
+                                                <p class="text-sm text-gray-500 truncate">
+                                                    {{ $buku->penerbit->nama_penerbit }}</p>
                                             </div>
+                                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                                {{ $buku->peminjaman_count }}x dipinjam</div>
                                         </li>
                                     @empty
-                                        <li>
-                                            <p class="text-sm text-gray-500">Belum ada aktivitas peminjaman.</p>
+                                        <li class="py-3 text-sm text-gray-500">Belum ada data peminjaman.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Anggota Teraktif -->
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Anggota
+                                    Teraktif</h3>
+                                <ul role="list" class="mt-4 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse ($anggotaAktif as $user)
+                                        <li class="py-3 flex">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                    {{ $user->name }}</p>
+                                                <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
+                                            </div>
+                                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                                {{ $user->peminjaman_count }}x meminjam</div>
                                         </li>
+                                    @empty
+                                        <li class="py-3 text-sm text-gray-500">Belum ada data peminjaman.</li>
                                     @endforelse
                                 </ul>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Panel Statistik Buku (Kolom Kanan) -->
-                    <div class="lg:col-span-1 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Statistik
-                                Penambahan Buku</h3>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">6 Bulan Terakhir</p>
-                            <div class="mt-6">
-                                <canvas id="bookChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                {{-- ======================================================== --}}
                 {{-- ============ TAMPILAN KHUSUS UNTUK USER BIASA ============ --}}
-                {{-- ======================================================== --}}
             @else
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2">
+                    <!-- Kolom Kiri: Buku Sedang Dipinjam & Rekomendasi -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Panel Buku Sedang Dipinjam -->
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6">
-                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Cari
-                                    Koleksi Buku</h3>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Temukan buku favoritmu di
-                                    antara ribuan koleksi kami.</p>
-                                <form action="{{ route('buku.index') }}" method="GET"
-                                    class="mt-4 flex rounded-md shadow-sm">
-                                    <input type="text" name="search"
-                                        class="block w-full flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 dark:bg-gray-700 dark:text-white"
-                                        placeholder="Ketik judul buku...">
-                                    <button type="submit"
-                                        class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Cari</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-1">
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6">
-                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Riwayat
-                                    Peminjaman Anda</h3>
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Buku
+                                    yang Sedang Anda Pinjam</h3>
                                 <div class="mt-4 space-y-4">
-                                    @forelse ($peminjamanUser as $peminjaman)
+                                    @forelse ($sedangDipinjam as $peminjaman)
                                         <div
-                                            class="border-l-4 @if ($peminjaman->status == 'pinjam') border-yellow-400 @else border-green-400 @endif pl-4 py-1">
+                                            class="border-l-4 @if ($peminjaman->is_overdue) border-red-400 @else border-yellow-400 @endif pl-4 py-2">
                                             <p class="font-semibold text-sm text-gray-800 dark:text-gray-200">
                                                 {{ $peminjaman->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</p>
-                                            <p class="text-xs text-gray-500">Dipinjam:
-                                                {{ \Carbon\Carbon::parse($peminjaman->tgl_pinjam)->isoFormat('D MMM Y') }}
+                                            <p class="text-xs text-gray-500">Batas Waktu: <span
+                                                    class="font-medium">{{ \Carbon\Carbon::parse($peminjaman->tanggal_harus_kembali)->isoFormat('D MMMM Y') }}</span>
                                             </p>
-                                            @if ($peminjaman->tgl_kembali)
-                                                <p class="text-xs text-gray-500">Dikembalikan:
-                                                    {{ \Carbon\Carbon::parse($peminjaman->tgl_kembali)->isoFormat('D MMM Y') }}
-                                                </p>
+                                            @if ($peminjaman->is_overdue)
+                                                <p class="text-xs font-bold text-red-500">Sudah Terlambat!</p>
                                             @endif
                                         </div>
                                     @empty
-                                        <p class="text-sm text-gray-500">Anda belum pernah meminjam buku.</p>
+                                        <p class="text-sm text-gray-500">Anda sedang tidak meminjam buku.</p>
                                     @endforelse
                                 </div>
+                            </div>
+                        </div>
+                        <!-- Panel Buku Paling Populer -->
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Buku
+                                    Paling Populer</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Lihat koleksi yang paling
+                                    disukai pengguna lain.</p>
+                                <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    @foreach ($bukuPopuler as $buku)
+                                        <a href="{{ route('buku.index', ['search' => $buku->judul_buku]) }}"
+                                            class="group">
+                                            <div
+                                                class="aspect-[2/3] w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
+                                                @if ($buku->sampul)
+                                                    <img src="{{ asset('storage/' . $buku->sampul) }}" alt="Sampul"
+                                                        class="h-full w-full object-cover object-center">
+                                                @else
+                                                    <div
+                                                        class="h-full w-full flex items-center justify-center text-gray-400">
+                                                        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                                                        </svg></div>
+                                                @endif
+                                            </div>
+                                            <h4
+                                                class="mt-2 text-xs font-medium text-gray-900 dark:text-white truncate">
+                                                {{ $buku->judul_buku }}</h4>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan: Statistik Pribadi -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">
+                                    Statistik Anda</h3>
+                                <dl class="mt-4 space-y-4">
+                                    <div class="flex flex-col rounded-lg bg-gray-50 dark:bg-gray-700/50 px-4 py-3">
+                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Buku
+                                            Dibaca</dt>
+                                        <dd
+                                            class="mt-1 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                                            {{ $totalDibaca }}</dd>
+                                    </div>
+                                    <div class="flex flex-col rounded-lg bg-gray-50 dark:bg-gray-700/50 px-4 py-3">
+                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Denda
+                                        </dt>
+                                        <dd
+                                            class="mt-1 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                                            Rp {{ number_format($totalDenda, 0, ',', '.') }}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <a href="{{ route('profile.history') }}"
+                                    class="group flex items-center justify-between">
+                                    <span
+                                        class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">Lihat
+                                        Semua Riwayat</span>
+                                    <span
+                                        class="text-indigo-600 group-hover:translate-x-1 transition-transform duration-200">&rarr;</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -241,26 +293,38 @@
     </div>
 
     @push('scripts')
-        {{-- Script hanya akan dimuat jika yang login adalah admin --}}
         @if (Auth::user()->role == 'admin')
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
-                const ctx = document.getElementById('bookChart');
+                const ctx = document.getElementById('loanChart').getContext('2d');
                 const isDarkMode = document.documentElement.classList.contains('dark');
+
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                if (isDarkMode) {
+                    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.7)');
+                    gradient.addColorStop(1, 'rgba(79, 70, 229, 0.1)');
+                } else {
+                    gradient.addColorStop(0, 'rgba(129, 140, 248, 0.7)');
+                    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
+                }
 
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: {!! $chartLabels !!},
+                        labels: {!! json_encode($loanChartLabels) !!},
                         datasets: [{
-                            label: 'Buku Baru',
-                            data: {!! $chartData !!},
-                            backgroundColor: 'rgba(79, 70, 229, 0.8)',
-                            borderColor: 'rgba(79, 70, 229, 1)',
-                            borderWidth: 1
+                            label: 'Jumlah Peminjaman',
+                            data: {!! json_encode($loanChartData) !!},
+                            backgroundColor: gradient,
+                            borderColor: isDarkMode ? 'rgba(165, 180, 252, 1)' : 'rgba(79, 70, 229, 1)',
+                            borderWidth: 2,
+                            borderRadius: 5,
+                            hoverBackgroundColor: isDarkMode ? 'rgba(129, 140, 248, 1)' : 'rgba(99, 102, 241, 1)'
                         }]
                     },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -269,7 +333,7 @@
                                     precision: 0
                                 },
                                 grid: {
-                                    color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                                    color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
                                 }
                             },
                             x: {
@@ -284,7 +348,17 @@
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            tooltip: {
+                                displayColors: false,
+                                callbacks: {
+                                    label: (context) => `${context.raw} Peminjaman`
+                                }
                             }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
                         }
                     }
                 });
