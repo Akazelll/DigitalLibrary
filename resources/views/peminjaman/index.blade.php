@@ -75,6 +75,11 @@
                             </p>
                         </div>
                     @endif
+                    @if ($errors->any())
+                        <div class="mb-4 rounded-md bg-red-100 dark:bg-red-900/50 p-4">
+                            <p class="text-sm font-medium text-red-700 dark:text-red-200">{{ $errors->first() }}</p>
+                        </div>
+                    @endif
 
                     {{-- Tampilan Desktop (TABLE) --}}
                     <div class="hidden lg:block overflow-x-auto">
@@ -84,10 +89,8 @@
                                     <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold sm:pl-6">No</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Peminjam</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Judul Buku</th>
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Tgl Pinjam</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Batas Waktu</th>
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Tgl Kembali</th>
-                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Denda</th>
+                                    <th class="px-3 py-3.5 text-left text-sm font-semibold">Sisa Denda</th>
                                     <th class="px-3 py-3.5 text-left text-sm font-semibold">Status</th>
                                     <th class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold">Aksi
                                     </th>
@@ -101,17 +104,12 @@
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">{{ $item->user->name }}</td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">
                                             {{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                            {{ \Carbon\Carbon::parse($item->tgl_pinjam)->format('d-m-Y') }}</td>
                                         <td
                                             class="whitespace-nowrap px-3 py-4 text-sm font-medium @if ($item->is_overdue) text-red-600 dark:text-red-400 @endif">
                                             {{ \Carbon\Carbon::parse($item->tanggal_harus_kembali)->format('d-m-Y') }}
                                         </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                            {{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}
-                                        </td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm font-semibold">
-                                            Rp {{ number_format($item->denda_terhitung, 0, ',', '.') }}
+                                            Rp {{ number_format($item->sisa_denda, 0, ',', '.') }}
                                         </td>
                                         <td class="whitespace-nowrap px-3 py-4 text-sm">
                                             @if ($item->is_overdue)
@@ -121,12 +119,24 @@
                                                 <span
                                                     class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900/50 px-2 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20">Dipinjam</span>
                                             @else
-                                                <span
-                                                    class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20">Kembali</span>
+                                                @if ($item->status_denda == 'Belum Lunas')
+                                                    <span
+                                                        class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/50 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-300 ring-1 ring-inset ring-orange-600/20">Denda
+                                                        Belum Lunas</span>
+                                                @else
+                                                    <span
+                                                        class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20">Lunas</span>
+                                                @endif
                                             @endif
                                         </td>
                                         <td
-                                            class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
+                                            @if ($item->sisa_denda > 0)
+                                                <button type="button"
+                                                    onclick="showPaymentModal({{ $item->id }}, {{ $item->sisa_denda }})"
+                                                    class="rounded-md bg-green-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-500">Bayar
+                                                    Denda</button>
+                                            @endif
                                             @if ($item->status == 'pinjam')
                                                 <a href="{{ route('peminjaman.edit', $item->id) }}"
                                                     class="rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
@@ -136,7 +146,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="px-3 py-4 text-sm text-center">Data peminjaman belum
+                                        <td colspan="8" class="px-3 py-4 text-sm text-center">Data peminjaman belum
                                             tersedia.</td>
                                     </tr>
                                 @endforelse
@@ -160,18 +170,20 @@
                                             <span
                                                 class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900/50 px-2 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20">Dipinjam</span>
                                         @else
-                                            <span
-                                                class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20">Kembali</span>
+                                            @if ($item->status_denda == 'Belum Lunas')
+                                                <span
+                                                    class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/50 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-300 ring-1 ring-inset ring-orange-600/20">Denda
+                                                    Belum Lunas</span>
+                                            @else
+                                                <span
+                                                    class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20">Lunas</span>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
                                 <div class="mt-2 space-y-2 text-sm text-gray-600 dark:text-gray-400">
                                     <div class="flex justify-between"><span
                                             class="font-medium text-gray-800 dark:text-gray-300">Peminjam:</span><span>{{ $item->user->name }}</span>
-                                    </div>
-                                    <div class="flex justify-between"><span
-                                            class="font-medium text-gray-800 dark:text-gray-300">Tgl
-                                            Pinjam:</span><span>{{ \Carbon\Carbon::parse($item->tgl_pinjam)->format('d-m-Y') }}</span>
                                     </div>
                                     <div
                                         class="flex justify-between @if ($item->is_overdue) text-red-600 dark:text-red-400 @endif">
@@ -180,27 +192,36 @@
                                             class="font-semibold">{{ \Carbon\Carbon::parse($item->tanggal_harus_kembali)->format('d-m-Y') }}</span>
                                     </div>
                                     <div class="flex justify-between"><span
-                                            class="font-medium text-gray-800 dark:text-gray-300">Tgl
-                                            Kembali:</span><span>{{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}</span>
-                                    </div>
-                                    <div class="flex justify-between"><span
-                                            class="font-medium text-gray-800 dark:text-gray-300">Denda:</span><span
+                                            class="font-medium text-gray-800 dark:text-gray-300">Sisa Denda:</span><span
                                             class="font-semibold">Rp
-                                            {{ number_format($item->denda_terhitung, 0, ',', '.') }}</span>
+                                            {{ number_format($item->sisa_denda, 0, ',', '.') }}</span>
                                     </div>
                                 </div>
-                                @if ($item->status == 'pinjam')
-                                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div
+                                    class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-2">
+                                    @if ($item->sisa_denda > 0)
+                                        <button type="button"
+                                            onclick="showPaymentModal({{ $item->id }}, {{ $item->sisa_denda }})"
+                                            class="w-full rounded-md bg-green-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-500">Bayar
+                                            Denda</button>
+                                    @endif
+                                    @if ($item->status == 'pinjam')
                                         <a href="{{ route('peminjaman.edit', $item->id) }}"
                                             class="w-full block rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
                                             onclick="event.preventDefault(); showReturnAlert(this.href);">Kembalikan</a>
-                                    </div>
-                                @endif
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <p class="text-sm text-center">Data peminjaman belum tersedia.</p>
                         @endforelse
                     </div>
+
+                    {{-- Form tersembunyi untuk pembayaran --}}
+                    <form id="payment-form" action="" method="POST" style="display: none;">
+                        @csrf
+                        <input type="hidden" name="jumlah_bayar" id="jumlah_bayar_input">
+                    </form>
 
                     <div class="mt-6">
                         {{ $peminjaman->links() }}
@@ -222,13 +243,50 @@
                     background: isDarkMode ? '#1f2937' : '#fff',
                     color: isDarkMode ? '#d1d5db' : '#111827',
                     showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, sudah!',
+                    confirmButtonColor: '#2563eb', // Blue-600
+                    cancelButtonColor: '#6b7280', // Gray-500
+                    confirmButtonText: 'Ya, Kembalikan!',
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = url;
+                    }
+                })
+            }
+
+            function showPaymentModal(peminjamanId, sisaDenda) {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+
+                Swal.fire({
+                    title: 'Pembayaran Denda',
+                    html: `Sisa denda yang harus dibayar: <strong>Rp ${new Intl.NumberFormat('id-ID').format(sisaDenda)}</strong>`,
+                    input: 'number',
+                    inputLabel: 'Masukkan jumlah pembayaran',
+                    inputPlaceholder: 'Contoh: 5000',
+                    showCancelButton: true,
+                    confirmButtonText: 'Bayar',
+                    cancelButtonText: 'Batal',
+                    background: isDarkMode ? '#1f2937' : '#fff',
+                    color: isDarkMode ? '#d1d5db' : '#111827',
+                    confirmButtonColor: '#16a34a', // Green-600
+                    cancelButtonColor: '#6b7280', // Gray-500
+                    inputValidator: (value) => {
+                        if (!value || value <= 0) {
+                            return 'Jumlah pembayaran tidak valid!'
+                        }
+                        if (parseInt(value) > sisaDenda) {
+                            return 'Jumlah pembayaran melebihi sisa denda!'
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('payment-form');
+                        const amountInput = document.getElementById('jumlah_bayar_input');
+
+                        form.action = `/peminjaman/${peminjamanId}/bayar-denda`;
+                        amountInput.value = result.value;
+
+                        form.submit();
                     }
                 })
             }

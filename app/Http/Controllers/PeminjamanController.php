@@ -10,11 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
-    // The __construct() method has been removed as middleware is handled in web.php
-
     public function index()
     {
-        $peminjaman = Peminjaman::with(['user', 'buku'])->latest('tgl_pinjam')->paginate(10);
+        $peminjaman = Peminjaman::with(['user', 'buku'])->latest('tgl_pinjam')->paginate(12);
         return view('peminjaman.index', compact('peminjaman'));
     }
 
@@ -46,7 +44,6 @@ class PeminjamanController extends Controller
                 'tanggal_harus_kembali' => \Carbon\Carbon::parse($request->tgl_pinjam)->addDays(7),
                 'status' => 'pinjam'
             ]);
-
             $buku->decrement('stok');
         });
 
@@ -59,14 +56,12 @@ class PeminjamanController extends Controller
             $peminjaman = Peminjaman::findOrFail($id);
 
             $denda = 0;
+            if (now()->gt($peminjaman->tanggal_harus_kembali)) {
+                $tanggalHarusKembali = \Carbon\Carbon::parse($peminjaman->tanggal_harus_kembali)->startOfDay();
+                $tanggalKembali = now()->startOfDay();
 
-            if ($peminjaman->is_overdue) {
-                $tanggalHarusKembali = \Carbon\Carbon::parse($peminjaman->tanggal_harus_kembali);
-                $tanggalKembali = now();
- 
-                $hariTerlambat = $tanggalKembali->diffInDays($tanggalHarusKembali);
-
-                if ($hariTerlambat > 0) {
+                if ($tanggalKembali->gt($tanggalHarusKembali)) {
+                    $hariTerlambat = $tanggalHarusKembali->diffInDays($tanggalKembali);
                     $denda = $hariTerlambat * Peminjaman::DENDA_PER_HARI;
                 }
             }
@@ -74,6 +69,7 @@ class PeminjamanController extends Controller
             $peminjaman->status = 'kembali';
             $peminjaman->tgl_kembali = now();
             $peminjaman->denda = $denda;
+            $peminjaman->status_denda = ($denda > 0) ? 'Belum Lunas' : 'Lunas';
             $peminjaman->save();
 
             $buku = Buku::find($peminjaman->id_buku);
@@ -85,9 +81,38 @@ class PeminjamanController extends Controller
         return redirect()->back()->with('success', 'Buku telah berhasil dikembalikan.');
     }
 
+    /**
+     * ===================================================================
+     * === PERBAIKAN DI SINI: Logika Pembayaran Denda yang Benar ===
+     * ===================================================================
+     */
+    public function bayarDenda(Request $request, Peminjaman $peminjaman)
+    {
+        $request->validate([
+            'jumlah_bayar' => 'required|integer|min:1'
+        ]);
+
+        $jumlahBayar = (int) $request->jumlah_bayar;
+        $sisaDenda = $peminjaman->sisa_denda;
+
+        // Validasi agar pembayaran tidak melebihi sisa denda
+        if ($jumlahBayar > $sisaDenda) {
+            return redirect()->back()->withErrors(['error' => 'Jumlah pembayaran melebihi sisa denda.']);
+        }
+
+        // Tambahkan pembayaran ke kolom denda_dibayar
+        $peminjaman->denda_dibayar += $jumlahBayar;
+
+        // Jika total yang dibayar sudah mencukupi, ubah status menjadi Lunas
+        if ($peminjaman->denda_dibayar >= $peminjaman->denda) {
+            $peminjaman->status_denda = 'Lunas';
+        }
+
+        $peminjaman->save();
+        return redirect()->back()->with('success', 'Pembayaran denda sebesar Rp ' . number_format($jumlahBayar, 0, ',', '.') . ' berhasil dicatat.');
+    }
+    // Method lain yang tidak digunakan
     public function show(string $id) {}
-
     public function update(Request $request, string $id) {}
-
     public function destroy(string $id) {}
 }

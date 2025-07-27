@@ -7,12 +7,13 @@
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            font-size: 11px;
+            font-size: 10px;
+            /* Ukuran font dikecilkan agar muat */
             color: #333;
         }
 
         @page {
-            margin: 100px 40px 50px 40px;
+            margin: 100px 25px 50px 25px;
         }
 
         header {
@@ -65,8 +66,10 @@
         .main-table th,
         .main-table td {
             border: 1px solid #000;
-            padding: 8px;
+            padding: 6px;
+            /* Padding dikecilkan */
             text-align: left;
+            vertical-align: top;
         }
 
         .main-table thead th {
@@ -79,6 +82,10 @@
 
         .text-center {
             text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
         }
 
         .no-data {
@@ -110,12 +117,15 @@
         <table class="main-table">
             <thead>
                 <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 15%;">Tanggal Pinjam</th>
-                    <th style="width: 20%;">Peminjam</th>
+                    <th style="width: 3%;">No</th>
+                    <th style="width: 10%;">Tgl Pinjam</th>
+                    <th style="width: 15%;">Peminjam</th>
                     <th>Judul Buku</th>
-                    <th style="width: 15%;">Tanggal Kembali</th>
-                    <th style="width: 12%;">Status</th>
+                    <th style="width: 10%;">Tgl Kembali</th>
+                    <th style="width: 10%;">Total Denda</th>
+                    <th style="width: 10%;">Dibayar</th>
+                    <th style="width: 10%;">Sisa Denda</th>
+                    <th style="width: 10%;">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -128,11 +138,20 @@
                         <td class="text-center">
                             {{ $item->tgl_kembali ? \Carbon\Carbon::parse($item->tgl_kembali)->format('d-m-Y') : '-' }}
                         </td>
-                        <td class="text-center">{{ $item->status == 'pinjam' ? 'Dipinjam' : 'Kembali' }}</td>
+                        <td class="text-right">Rp {{ number_format($item->denda, 0, ',', '.') }}</td>
+                        <td class="text-right">Rp {{ number_format($item->denda_dibayar, 0, ',', '.') }}</td>
+                        <td class="text-right">Rp {{ number_format($item->sisa_denda, 0, ',', '.') }}</td>
+                        <td class="text-center">
+                            @if ($item->status == 'pinjam')
+                                Dipinjam
+                            @else
+                                {{ $item->status_denda }}
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="no-data">Tidak ada data transaksi peminjaman untuk periode ini.</td>
+                        <td colspan="9" class="no-data">Tidak ada data transaksi peminjaman untuk periode ini.</td>
                     </tr>
                 @endforelse
             </tbody>
