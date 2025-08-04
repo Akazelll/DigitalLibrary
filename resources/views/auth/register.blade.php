@@ -16,23 +16,21 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans text-gray-900 antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-        <div
-            class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+<body class="font-sans text-text-main antialiased">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-base">
+        <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-surface shadow-md overflow-hidden sm:rounded-lg">
 
             <!-- Logo dan Header -->
             <div class="flex flex-col items-center mb-6">
                 <a href="/" class="flex items-center gap-2">
-                    <svg class="h-10 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    <svg class="h-10 w-auto text-primary" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                     </svg>
-                    <span
-                        class="font-semibold text-2xl text-gray-900 dark:text-white">{{ config('app.name', 'Laravel') }}</span>
+                    <span class="font-semibold text-2xl text-text-main">{{ config('app.name', 'Laravel') }}</span>
                 </a>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Buat akun baru untuk memulai.</p>
+                <p class="mt-2 text-sm text-text-subtle">Buat akun baru untuk memulai.</p>
             </div>
 
             <form method="POST" action="{{ route('register') }}">
@@ -75,7 +73,7 @@
                         {{ __('Register') }}
                     </x-primary-button>
 
-                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+                    <a class="underline text-sm text-text-subtle hover:text-text-main rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary mt-4"
                         href="{{ route('login') }}">
                         {{ __('Sudah punya akun?') }}
                     </a>

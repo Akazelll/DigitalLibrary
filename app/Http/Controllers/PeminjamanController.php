@@ -65,28 +65,41 @@ class PeminjamanController extends Controller
         return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman berhasil ditambahkan.');
     }
 
+
+
     public function edit(string $id)
     {
         DB::transaction(function () use ($id) {
             $peminjaman = Peminjaman::findOrFail($id);
 
-            $denda = 0;
+            if ($peminjaman->status === 'kembali') {
+                return;
+            }
+
+            $dendaFinal = 0;
             if (now()->gt($peminjaman->tanggal_harus_kembali)) {
                 $tanggalHarusKembali = \Carbon\Carbon::parse($peminjaman->tanggal_harus_kembali)->startOfDay();
                 $tanggalKembali = now()->startOfDay();
-
                 if ($tanggalKembali->gt($tanggalHarusKembali)) {
                     $hariTerlambat = $tanggalHarusKembali->diffInDays($tanggalKembali);
-                    $denda = $hariTerlambat * Peminjaman::DENDA_PER_HARI;
+                    $dendaFinal = $hariTerlambat * Peminjaman::DENDA_PER_HARI;
                 }
             }
 
+           
             $peminjaman->status = 'kembali';
             $peminjaman->tgl_kembali = now();
-            $peminjaman->denda = $denda;
-            $peminjaman->status_denda = ($denda > 0) ? 'Belum Lunas' : 'Lunas';
+            $peminjaman->denda = $dendaFinal; 
+
+            if ($peminjaman->denda_dibayar >= $dendaFinal) {
+                $peminjaman->status_denda = 'Lunas';
+            } else {
+                $peminjaman->status_denda = 'Belum Lunas';
+            }
+        
             $peminjaman->save();
 
+            // Kembalikan stok buku
             $buku = Buku::find($peminjaman->id_buku);
             if ($buku) {
                 $buku->increment('stok');
@@ -96,11 +109,7 @@ class PeminjamanController extends Controller
         return redirect()->back()->with('success', 'Buku telah berhasil dikembalikan.');
     }
 
-    /**
-     * ===================================================================
-     * === PERBAIKAN DI SINI: Logika Pembayaran Denda yang Benar ===
-     * ===================================================================
-     */
+
     public function bayarDenda(Request $request, Peminjaman $peminjaman)
     {
         $request->validate([
