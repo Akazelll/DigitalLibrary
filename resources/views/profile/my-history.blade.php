@@ -17,9 +17,7 @@
                             sedang dan pernah Anda pinjam.</p>
                     </div>
 
-                    {{-- ======================================================= --}}
-                    {{-- === TAMPILAN BARU: LINIMASA PEMINJAMAN (RESPONSIF) === --}}
-                    {{-- ======================================================= --}}
+
                     <div class="flow-root">
                         <ul role="list" class="-mb-8">
                             @forelse ($peminjaman as $item)

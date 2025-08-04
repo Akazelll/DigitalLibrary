@@ -16,11 +16,29 @@ class PeminjamanController extends Controller
         return view('peminjaman.index', compact('peminjaman'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $users = User::all();
-        $buku = Buku::where('stok', '>', 0)->get();
-        return view('peminjaman.create', compact('users', 'buku'));
+        $user = null;
+        $buku = null;
+
+        if ($request->has('kode_anggota')) {
+            $user = User::where('kode_anggota', $request->kode_anggota)->first();
+            if (!$user) {
+                return redirect()->route('peminjaman.create')->withErrors(['kode_anggota' => 'Kode anggota tidak ditemukan.']);
+            }
+        }
+
+        if ($user && $request->has('kode_buku')) {
+            $buku = Buku::where('kode_buku', $request->kode_buku)->first();
+            if (!$buku) {
+                return redirect()->route('peminjaman.create', ['kode_anggota' => $user->kode_anggota])->withErrors(['kode_buku' => 'Kode buku tidak ditemukan.']);
+            }
+            if ($buku->stok < 1) {
+                return redirect()->route('peminjaman.create', ['kode_anggota' => $user->kode_anggota])->withErrors(['kode_buku' => 'Stok buku ini telah habis.']);
+            }
+        }
+
+        return view('peminjaman.create', compact('user', 'buku'));
     }
 
     public function store(Request $request)
@@ -32,9 +50,6 @@ class PeminjamanController extends Controller
         ]);
 
         $buku = Buku::findOrFail($request->id_buku);
-        if ($buku->stok < 1) {
-            return redirect()->back()->withErrors(['id_buku' => 'Stok buku ini telah habis.'])->withInput();
-        }
 
         DB::transaction(function () use ($request, $buku) {
             Peminjaman::create([

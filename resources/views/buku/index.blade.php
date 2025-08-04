@@ -10,6 +10,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
+                    {{-- Header dengan Form Pencarian dan Tombol Tambah --}}
                     <div class="sm:flex sm:items-center justify-between mb-6">
                         <div class="sm:flex-auto">
                             <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-100">Koleksi Buku
@@ -31,6 +32,16 @@
                                 <a href="{{ route('buku.create') }}"
                                     class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Tambah
                                     Buku</a>
+                                <a href="{{ route('buku.download') }}" target="_blank"
+                                    class="inline-flex items-center gap-x-2 rounded-md bg-cyan-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 transition-colors duration-200">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 9.7a.75.75 0 00-1.1 1.02l3.25 3.5a.75.75 0 001.1 0l3.25-3.5a.75.75 0 10-1.1-1.02l-1.95 2.1V6.75z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    Download
+                                </a>
                             @endif
                         </div>
                     </div>
@@ -42,10 +53,12 @@
                         </div>
                     @endif
 
+                    {{-- Tampilan Grid Kartu Buku (Responsif) --}}
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
                         @forelse ($buku as $item)
                             <div
                                 class="relative flex flex-col bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow p-4 transition-transform duration-300 hover:-translate-y-1">
+                                {{-- Gambar Sampul --}}
                                 <div
                                     class="aspect-[2/3] w-full overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700 mb-4">
                                     @if ($item->sampul)
@@ -63,11 +76,20 @@
                                     @endif
                                 </div>
 
+                                {{-- Detail Buku --}}
                                 <div class="flex flex-col flex-1">
                                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
                                         {{ $item->judul_buku }}</h3>
                                     <p class="mt-1 text-sm text-gray-500 truncate">{{ $item->penerbit->nama_penerbit }}
                                     </p>
+
+                                    {{-- ======================================================= --}}
+                                    {{-- === PERUBAHAN DI SINI: Menampilkan Kode Buku (Admin) === --}}
+                                    {{-- ======================================================= --}}
+                                    @if (Auth::user()->role == 'admin')
+                                        <p class="mt-1 text-xs font-mono text-gray-400 dark:text-gray-500">ID:
+                                            {{ $item->kode_buku }}</p>
+                                    @endif
 
                                     <div class="mt-2 flex justify-between text-xs text-gray-500">
                                         <span>Tahun: {{ $item->tahun_terbit }}</span>
@@ -77,17 +99,18 @@
                                     <p class="mt-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">Stok:
                                         {{ $item->stok }}</p>
 
+                                    {{-- Tombol Aksi untuk Admin --}}
                                     @if (Auth::user()->role == 'admin')
                                         <div
                                             class="mt-auto pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 mt-4">
                                             <a href="{{ route('buku.edit', $item) }}"
-                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-green-600 hover:bg-gray-50 dark:hover:bg-green-600">Edit</a>
+                                                class="flex-1 text-center rounded-md bg-white dark:bg-gray-700 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Edit</a>
                                             <form action="{{ route('buku.destroy', $item->id) }}" method="POST"
                                                 id="delete-form-buku-{{ $item->id }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" onclick="showAlert({{ $item->id }}, 'buku')"
-                                                    class="rounded-md bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-red-600 hover:bg-red-500">Hapus</button>
+                                                    class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Hapus</button>
                                             </form>
                                         </div>
                                     @endif
@@ -99,21 +122,11 @@
                             </div>
                         @endforelse
                     </div>
+
+                    {{-- Pagination Links --}}
                     <div class="mt-6">
                         {{ $buku->appends(request()->query())->links() }}
                     </div>
-                    @if (request('kategori'))
-                        <div
-                            class="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/50 rounded-lg flex items-center justify-between">
-                            <p class="text-sm text-indigo-800 dark:text-indigo-200">
-                                Menampilkan buku untuk kategori: <span
-                                    class="font-bold">{{ request('kategori') }}</span>
-                            </p>
-                            <a href="{{ route('buku.index') }}"
-                                class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">&times; Hapus
-                                Filter</a>
-                        </div>
-                    @endif
 
                 </div>
             </div>

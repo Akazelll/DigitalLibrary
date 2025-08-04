@@ -1,10 +1,8 @@
 <nav x-data="{ open: false }"
-    class="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-    <!-- Primary Navigation Menu -->
+    class="relative sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
                         <svg class="h-8 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -17,16 +15,11 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-
                     @auth
-                        {{-- ======================================================================= --}}
-                        {{-- === PERBAIKAN: Menu untuk semua user yang login === --}}
-                        {{-- ======================================================================= --}}
                         <x-nav-link :href="route('buku.index')" :active="request()->routeIs('buku.*')">
                             {{ __('Buku') }}
                         </x-nav-link>
@@ -36,24 +29,21 @@
                         <x-nav-link :href="route('penerbit.index')" :active="request()->routeIs('penerbit.*')">
                             {{ __('Penerbit') }}
                         </x-nav-link>
-
-                        {{-- ======================================================================= --}}
-                        {{-- === PERBAIKAN: Menu khusus admin === --}}
-                        {{-- ======================================================================= --}}
                         @if (Auth::user()->role == 'admin')
                             <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
                                 {{ __('Peminjaman') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                                {{ __('Manajemen User') }}
                             </x-nav-link>
                         @endif
                     @endauth
                 </div>
             </div>
 
-            <!-- Settings Dropdown & Theme Switcher -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 {{-- Theme Switcher Anda akan tetap di sini --}}
-                
-                <!-- User Settings Dropdown -->
+
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
@@ -81,7 +71,6 @@
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
@@ -97,15 +86,14 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu (Mobile) -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
+    <div :class="{ 'block': open, 'hidden': !open }"
+        class="hidden sm:hidden absolute w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
             @auth
-                {{-- Menu untuk semua user yang login --}}
                 <x-responsive-nav-link :href="route('buku.index')" :active="request()->routeIs('buku.*')">
                     {{ __('Buku') }}
                 </x-responsive-nav-link>
@@ -116,16 +104,17 @@
                     {{ __('Penerbit') }}
                 </x-responsive-nav-link>
 
-                {{-- Menu khusus admin --}}
                 @if (Auth::user()->role == 'admin')
                     <x-responsive-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
                         {{ __('Peminjaman') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                        {{ __('Manajemen User') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
         </div>
 
-        <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>

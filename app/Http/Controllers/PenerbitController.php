@@ -66,4 +66,11 @@ class PenerbitController extends Controller
         $penerbit->delete();
         return redirect()->back()->with('success', 'Penerbit berhasil dihapus.');
     }
+
+    public function downloadPDF()
+    {
+        $penerbit = Penerbit::withCount('buku')->orderBy('nama_penerbit', 'asc')->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('penerbit.pdf', compact('penerbit'));
+        return $pdf->stream('laporan-data-penerbit.pdf');
+    }
 }

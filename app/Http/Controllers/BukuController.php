@@ -50,8 +50,15 @@ class BukuController extends Controller
     // 2. Ganti 'Request' menjadi 'StoreBukuRequest'
     public function store(StoreBukuRequest $request)
     {
-        // Sekarang $request->validated() akan berfungsi
+
         $validatedData = $request->validated();
+
+
+        do {
+            $kodeBuku = strtoupper(String::random(5)) . mt_rand(10000, 99999);
+        } while (Buku::where('kode_buku', $kodeBuku)->exists());
+
+        $validatedData['kode_buku'] = $kodeBuku;
 
         if ($request->hasFile('sampul')) {
             $path = $request->file('sampul')->store('sampul_buku', 'public');
@@ -98,5 +105,12 @@ class BukuController extends Controller
     {
         $buku->delete();
         return redirect()->back()->with('success', 'Buku berhasil dihapus.');
+    }
+
+    public function downloadPDF()
+    {
+        $buku = Buku::with(['penerbit', 'kategori'])->orderBy('judul_buku', 'asc')->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku.pdf', compact('buku'));
+        return $pdf->stream('laporan-data-buku.pdf');
     }
 }

@@ -11,6 +11,8 @@ use App\Http\Controllers\BukuController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\BookScannerController;
 
 use App\Models\User;
 use App\Models\Penerbit;
@@ -100,6 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('penerbit', PenerbitController::class)->except(['index', 'show']);
         Route::resource('peminjaman', PeminjamanController::class)->except(['show', 'destroy']);
         Route::resource('kategori', KategoriController::class)->except(['index', 'show']);
+        Route::resource('users', UserController::class)->except(['create', 'store', 'show']);
 
         Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
         Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
@@ -107,9 +110,15 @@ Route::middleware('auth')->group(function () {
         Route::put('/buku/{buku}', [BukuController::class, 'update'])->name('buku.update');
         Route::delete('/buku/{buku}', [BukuController::class, 'destroy'])->name('buku.destroy');
         Route::post('/peminjaman/{peminjaman}/bayar-denda', [PeminjamanController::class, 'bayarDenda'])->name('peminjaman.bayarDenda');
-        
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
+        Route::post('/buku/scan-sampul', [BookScannerController::class, 'scan'])->name('buku.scan');
+
 
         Route::get('/laporan/peminjaman/cetak', [LaporanController::class, 'cetakPeminjaman'])->name('laporan.peminjaman.cetak');
+        Route::get('/buku/download', [BukuController::class, 'downloadPDF'])->name('buku.download');
+        Route::get('/penerbit/download', [PenerbitController::class, 'downloadPDF'])->name('penerbit.download');
+        Route::get('/users/download', [UserController::class, 'downloadPDF'])->name('users.download');
     });
 
     Route::get('/buku/{buku}', [BukuController::class, 'show'])->name('buku.show');
