@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Tambah Peminjaman Baru') }}
         </h2>
     </x-slot>
@@ -9,10 +9,12 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- BAGIAN 1: FORM PENCARIAN ANGGOTA --}}
-            <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8">
-                    <h3 class="text-lg font-semibold leading-6 text-text-main">Langkah 1: Cari Anggota</h3>
-                    <p class="mt-1 text-sm text-text-subtle">Masukkan kode anggota untuk menemukan peminjam.</p>
+                    <h3 class="text-lg font-semibold leading-6 text-text-main dark:text-dark-text-main">Langkah 1: Cari
+                        Anggota</h3>
+                    <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">Masukkan kode anggota untuk
+                        menemukan peminjam.</p>
 
                     <form action="{{ route('peminjaman.create') }}" method="GET"
                         class="mt-4 sm:flex sm:items-start sm:gap-4">
@@ -29,15 +31,19 @@
 
             {{-- BAGIAN 2: FORM PEMINJAMAN (HANYA MUNCUL JIKA ANGGOTA DITEMUKAN) --}}
             @if (isset($user) && $user)
-                <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 md:p-8">
-                        <h3 class="text-lg font-semibold leading-6 text-text-main">Langkah 2: Cari & Tambah Buku</h3>
+                        <h3 class="text-lg font-semibold leading-6 text-text-main dark:text-dark-text-main">Langkah 2:
+                            Cari & Tambah Buku</h3>
 
-                        <div class="mt-4 p-4 bg-base rounded-lg">
-                            <p class="text-sm font-medium text-text-subtle">Nama Peminjam: <span
-                                    class="font-semibold text-text-main">{{ $user->name }}</span></p>
-                            <p class="mt-1 text-sm font-medium text-text-subtle">Kode Anggota: <span
-                                    class="font-semibold text-text-main">{{ $user->kode_anggota }}</span>
+                        <div class="mt-4 p-4 bg-base dark:bg-dark-base rounded-lg">
+                            <p class="text-sm font-medium text-text-subtle dark:text-dark-text-subtle">Nama Peminjam:
+                                <span
+                                    class="font-semibold text-text-main dark:text-dark-text-main">{{ $user->name }}</span>
+                            </p>
+                            <p class="mt-1 text-sm font-medium text-text-subtle dark:text-dark-text-subtle">Kode
+                                Anggota: <span
+                                    class="font-semibold text-text-main dark:text-dark-text-main">{{ $user->kode_anggota }}</span>
                             </p>
                         </div>
 
@@ -56,14 +62,15 @@
 
                         {{-- Form Submit Peminjaman (HANYA MUNCUL JIKA BUKU DITEMUKAN) --}}
                         @if (isset($buku) && $buku)
-                            <div class="mt-6 pt-6 border-t border-gray-200">
-                                <div class="p-4 bg-green-50 rounded-lg">
-                                    <p class="font-semibold text-green-800">Buku Ditemukan:</p>
-                                    <p class="mt-1 text-sm text-gray-700">Judul: <span
-                                            class="font-semibold text-gray-900">{{ $buku->judul_buku }}</span>
+                            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-dark-primary">
+                                <div class="p-4 bg-green-50 dark:bg-green-500/10 rounded-lg">
+                                    <p class="font-semibold text-green-800 dark:text-green-300">Buku Ditemukan:</p>
+                                    <p class="mt-1 text-sm text-gray-700 dark:text-dark-text-subtle">Judul: <span
+                                            class="font-semibold text-gray-900 dark:text-dark-text-main">{{ $buku->judul_buku }}</span>
                                     </p>
-                                    <p class="mt-1 text-sm text-gray-700">Stok Tersedia: <span
-                                            class="font-semibold text-gray-900">{{ $buku->stok }}</span>
+                                    <p class="mt-1 text-sm text-gray-700 dark:text-dark-text-subtle">Stok Tersedia:
+                                        <span
+                                            class="font-semibold text-gray-900 dark:text-dark-text-main">{{ $buku->stok }}</span>
                                     </p>
                                 </div>
                                 <form action="{{ route('peminjaman.store') }}" method="POST" class="mt-6 space-y-6">
@@ -78,7 +85,7 @@
                                     </div>
                                     <div class="flex items-center justify-end gap-x-4 pt-4">
                                         <a href="{{ route('peminjaman.index') }}"
-                                            class="text-sm font-semibold leading-6 text-text-subtle hover:text-text-main">Batal</a>
+                                            class="text-sm font-semibold leading-6 text-text-subtle dark:text-dark-text-subtle hover:text-text-main dark:hover:text-dark-text-main">Batal</a>
                                         <x-primary-button>{{ __('Simpan Peminjaman') }}</x-primary-button>
                                     </div>
                                 </form>

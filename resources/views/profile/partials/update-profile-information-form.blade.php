@@ -1,13 +1,12 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-text-main">
+        <h2 class="text-lg font-medium text-text-main dark:text-dark-text-main">
             {{ __('Informasi Profil') }}
         </h2>
 
-        <p class="mt-1 text-sm text-text-subtle">
+        <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">
             {{ __('Perbarui informasi profil dan alamat email akun Anda.') }}
         </p>
-        
     </header>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
@@ -21,7 +20,8 @@
         <div>
             <x-input-label for="kode_anggota" :value="__('Kode Anggota')" />
             <x-text-input id="kode_anggota" name="kode_anggota" type="text"
-                class="mt-1 block w-full bg-base border-gray-200" :value="$user->kode_anggota" disabled />
+                class="mt-1 block w-full bg-base dark:bg-dark-primary/50 border-gray-200 dark:border-dark-primary"
+                :value="$user->kode_anggota" disabled />
         </div>
 
         <div>

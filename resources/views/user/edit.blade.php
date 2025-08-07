@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Edit Pengguna: ') . $user->name }}
         </h2>
     </x-slot>
@@ -8,13 +8,17 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
             {{-- Form untuk Informasi Profil --}}
-            <div class="p-4 sm:p-8 bg-surface shadow-sm sm:rounded-lg">
+            <div class="p-4 sm:p-8 bg-surface dark:bg-dark-surface shadow-sm sm:rounded-lg">
                 <section>
                     <header>
-                        <h2 class="text-lg font-medium text-text-main">Informasi Profil</h2>
-                        <p class="mt-1 text-sm text-text-subtle">Perbarui informasi profil dan alamat email pengguna.</p>
+                        <h2 class="text-lg font-medium text-text-main dark:text-dark-text-main">Informasi Profil</h2>
+                        <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">Perbarui informasi profil dan
+                            alamat email pengguna.</p>
                     </header>
-                    <form method="post" action="{{ route('users.update', $user) }}" class="mt-6 space-y-6">
+
+                    {{-- Menambahkan onsubmit untuk memanggil SweetAlert --}}
+                    <form method="post" action="{{ route('users.update', $user) }}" class="mt-6 space-y-6"
+                        onsubmit="confirmUpdate(event, 'profil')">
                         @csrf
                         @method('PUT')
 
@@ -38,14 +42,17 @@
             </div>
 
             {{-- Form untuk Reset Password --}}
-            <div class="p-4 sm:p-8 bg-surface shadow-sm sm:rounded-lg">
+            <div class="p-4 sm:p-8 bg-surface dark:bg-dark-surface shadow-sm sm:rounded-lg">
                 <section>
                     <header>
-                        <h2 class="text-lg font-medium text-text-main">Reset Password</h2>
-                        <p class="mt-1 text-sm text-text-subtle">Buat password baru untuk pengguna ini. Biarkan kosong
-                            jika tidak ingin mengubahnya.</p>
+                        <h2 class="text-lg font-medium text-text-main dark:text-dark-text-main">Reset Password</h2>
+                        <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">Buat password baru untuk
+                            pengguna ini. Biarkan kosong jika tidak ingin mengubahnya.</p>
                     </header>
-                    <form method="post" action="{{ route('users.update', $user) }}" class="mt-6 space-y-6">
+
+                    {{-- Menambahkan onsubmit untuk memanggil SweetAlert --}}
+                    <form method="post" action="{{ route('users.update', $user) }}" class="mt-6 space-y-6"
+                        onsubmit="confirmUpdate(event, 'password')">
                         @csrf
                         @method('PUT')
 
@@ -69,4 +76,33 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            function confirmUpdate(event, formType) {
+                event.preventDefault(); // Mencegah form dikirim secara langsung
+
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                let titleText = formType === 'profil' ? 'Konfirmasi Perubahan Profil' : 'Konfirmasi Reset Password';
+
+                Swal.fire({
+                    title: titleText,
+                    text: "Apakah Anda yakin ingin menyimpan perubahan ini?",
+                    icon: 'question',
+                    background: isDarkMode ? '#1A1A1A' : '#ffffff',
+                    color: isDarkMode ? '#EDEDED' : '#111827',
+                    showCancelButton: true,
+                    confirmButtonColor: '#16a34a',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Simpan!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika dikonfirmasi, kirim form
+                        event.target.submit();
+                    }
+                })
+            }
+        </script>
+    @endpush
 </x-app-layout>

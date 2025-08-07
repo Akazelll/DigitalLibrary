@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+    display: none;
+}
 @layer utilities {
     @keyframes fadeIn {
         from {
@@ -17,4 +20,7 @@
     .animate-fadeIn {
         animation: fadeIn 1s ease-out forwards;
     }
+}
+body {
+    scrollbar-width: none;
 }

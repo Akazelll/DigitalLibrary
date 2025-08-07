@@ -1,34 +1,34 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Riwayat Peminjaman Saya') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
 
                     <div class="mb-6">
-                        <h2 class="text-xl font-semibold leading-6 text-text-main">Aktivitas Peminjaman Anda</h2>
-                        <p class="mt-1 text-sm text-text-subtle">Berikut adalah daftar semua buku yang sedang dan pernah
-                            Anda pinjam.</p>
+                        <h2 class="text-xl font-semibold leading-6 text-text-main dark:text-dark-text-main">Aktivitas
+                            Peminjaman Anda</h2>
+                        <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">Berikut adalah daftar semua
+                            buku yang sedang dan pernah Anda pinjam.</p>
                     </div>
 
-                    {{-- PERUBAHAN DI SINI: Menggunakan space-y untuk memberi jarak antar kartu --}}
                     <div class="space-y-4">
                         @forelse ($peminjaman as $item)
                             {{-- Setiap transaksi dibungkus dalam div dengan border --}}
                             <div
-                                class="bg-base rounded-lg shadow-sm p-4 border border-gray-200 flex items-start space-x-4">
+                                class="bg-base dark:bg-dark-surface rounded-lg shadow-sm p-4 border border-gray-200 dark:border-dark-primary flex items-start space-x-4">
 
                                 {{-- Ikon Status --}}
                                 <div
                                     class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center
-                                    @if ($item->is_overdue) bg-danger @elseif($item->status == 'pinjam') bg-warning @else bg-success @endif">
+                                    @if ($item->is_overdue && $item->status == 'pinjam') bg-danger @elseif($item->status == 'pinjam') bg-warning @else bg-success @endif">
 
-                                    @if ($item->is_overdue)
+                                    @if ($item->is_overdue && $item->status == 'pinjam')
                                         <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd"
@@ -56,8 +56,8 @@
                                 <div class="min-w-0 flex-1">
                                     <div class="text-sm">
                                         <span
-                                            class="font-medium text-text-main">{{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</span>
-                                        @if ($item->is_overdue)
+                                            class="font-medium text-text-main dark:text-dark-text-main">{{ $item->buku?->judul_buku ?? 'Buku Telah Dihapus' }}</span>
+                                        @if ($item->is_overdue && $item->status == 'pinjam')
                                             <span class="font-medium text-danger">(Terlambat)</span>
                                         @elseif($item->status == 'pinjam')
                                             <span class="font-medium text-warning">(Sedang Dipinjam)</span>
@@ -65,7 +65,7 @@
                                             <span class="font-medium text-success">(Sudah Kembali)</span>
                                         @endif
                                     </div>
-                                    <div class="mt-2 text-xs text-text-subtle space-y-1">
+                                    <div class="mt-2 text-xs text-text-subtle dark:text-dark-text-subtle space-y-1">
                                         <p><strong>Tgl. Pinjam:</strong>
                                             {{ \Carbon\Carbon::parse($item->tgl_pinjam)->isoFormat('D MMMM Y') }}</p>
                                         <p><strong>Batas Waktu:</strong>
@@ -82,7 +82,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="text-center text-text-subtle py-10">
+                            <div class="text-center text-text-subtle dark:text-dark-text-subtle py-10">
                                 <p>Anda belum memiliki riwayat peminjaman.</p>
                             </div>
                         @endforelse

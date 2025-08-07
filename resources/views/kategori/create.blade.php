@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Tambah Kategori Baru') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8">
                     <form action="{{ route('kategori.store') }}" method="POST" class="space-y-6">
                         @csrf
@@ -20,7 +20,7 @@
 
                         <div class="flex items-center justify-end gap-x-4 pt-4">
                             <a href="{{ route('kategori.index') }}"
-                                class="text-sm font-semibold leading-6 text-text-subtle hover:text-text-main">Batal</a>
+                                class="text-sm font-semibold leading-6 text-text-subtle dark:text-dark-text-subtle hover:text-text-main dark:hover:text-dark-text-main">Batal</a>
                             <x-primary-button>{{ __('Simpan') }}</x-primary-button>
                         </div>
                     </form>

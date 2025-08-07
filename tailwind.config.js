@@ -3,7 +3,8 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: false,
+    // WAJIB: Aktifkan mode gelap berbasis 'class'
+    darkMode: 'class',
 
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
@@ -17,29 +18,26 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                // Palet Baru yang Lebih Kontras dan Profesional
-                'base': '#f3f4f6',      // Latar belakang utama (Abu-abu muda DINGIN)
-                'surface': '#ffffff',   // Latar belakang untuk card, input, dropdown (Putih bersih)
-                'primary': '#4f46e5',   // Warna utama untuk tombol & link (Biru Indigo yang kuat)
-                'highlight': '#e0e7ff', // Warna untuk hover/focus (Biru Indigo sangat muda)
+                'base': '#f3f4f6',
+                'surface': '#ffffff',
+                'primary': '#4f46e5',
+                'highlight': '#e0e7ff',
+                'text-main': '#111827',
+                'text-subtle': '#6b7280',
+                
+                // Warna Tema Gelap
+                'dark-base': '#000000',
+                'dark-surface': '#1A1A1A',
+                'dark-primary': '#758bfd',
+                'dark-highlight': '#758bfd',
+                'dark-text-main': '#EDEDED',
+                'dark-text-subtle': '#9D9D9D',
 
-                'text-main': '#111827',    // Warna teks utama (Hampir hitam)
-                'text-subtle': '#6b7280',// Warna teks sekunder/abu-abu
-
-                // Warna Status Notifikasi
+                // Warna Status
                 'danger': '#e11d48',
                 'success': '#16a34a',
                 'warning': '#f59e0b',
                 'info': '#0ea5e9',
-            },
-            animation: {
-                'fadeIn': 'fadeIn 1s ease-out forwards',
-            },
-            keyframes: {
-                fadeIn: {
-                    'from': { opacity: 0, transform: 'translateY(20px)' },
-                    'to': { opacity: 1, transform: 'translateY(0)' },
-                }
             },
         },
     },

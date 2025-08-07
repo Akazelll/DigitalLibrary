@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-text-main">
+        <h2 class="text-lg font-medium text-text-main dark:text-dark-text-main">
             {{ __('Update Password') }}
         </h2>
 
-        <p class="mt-1 text-sm text-text-subtle">
+        <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">
             {{ __('Pastikan akun Anda menggunakan password yang panjang dan acak agar tetap aman.') }}
         </p>
     </header>

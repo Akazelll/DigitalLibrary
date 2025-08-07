@@ -1,20 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Manajemen Pengguna') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
 
                     <div class="sm:flex sm:items-center justify-between mb-6">
                         <div class="sm:flex-auto">
-                            <h2 class="text-xl font-semibold leading-6 text-text-main">Daftar Anggota</h2>
-                            <p class="mt-1 text-sm text-text-subtle">Kelola semua data anggota yang terdaftar di
-                                perpustakaan.</p>
+                            <h2 class="text-xl font-semibold leading-6 text-text-main dark:text-dark-text-main">Daftar
+                                Anggota</h2>
+                            <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">Kelola semua data anggota
+                                yang terdaftar di perpustakaan.</p>
                         </div>
                         @if (Auth::user()->role == 'admin')
                             <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -33,24 +34,25 @@
                     </div>
 
                     @if (session('success'))
-                        <div class="mb-4 rounded-md bg-green-50 p-4">
-                            <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                        <div class="mb-4 rounded-md bg-green-50 dark:bg-green-500/10 p-4">
+                            <p class="text-sm font-medium text-green-800 dark:text-green-300">{{ session('success') }}
+                            </p>
                         </div>
                     @endif
                     @if ($errors->any())
-                        <div class="mb-4 rounded-md bg-red-50 p-4">
-                            <p class="text-sm font-medium text-red-700">{{ $errors->first() }}</p>
+                        <div class="mb-4 rounded-md bg-red-50 dark:bg-red-500/10 p-4">
+                            <p class="text-sm font-medium text-red-700 dark:text-red-300">{{ $errors->first() }}</p>
                         </div>
                     @endif
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         @forelse ($users as $user)
-                            <div class="group bg-base rounded-lg shadow-sm p-6 flex flex-col">
+                            <div class="group bg-base dark:bg-dark-base rounded-lg shadow-sm p-6 flex flex-col">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-4">
                                         <div class="flex-shrink-0">
                                             <span
-                                                class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-highlight text-primary">
+                                                class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-highlight dark:bg-dark-highlight text-primary dark:text-dark-text-main">
                                                 <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -59,31 +61,42 @@
                                             </span>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-lg font-semibold text-text-main truncate"
+                                            <p class="text-lg font-semibold text-text-main dark:text-dark-text-main truncate"
                                                 title="{{ $user->name }}">
                                                 {{ $user->name }}
                                             </p>
-                                            <p class="text-sm text-text-subtle truncate" title="{{ $user->email }}">
+                                            <p class="text-sm text-text-subtle dark:text-dark-text-subtle truncate"
+                                                title="{{ $user->email }}">
                                                 {{ $user->email }}</p>
                                         </div>
                                     </div>
                                     <dl class="mt-4 grid grid-cols-2 gap-4">
-                                        <div class="flex flex-col rounded-lg bg-surface px-4 py-3">
-                                            <dt class="text-sm font-medium text-text-subtle">Kode Anggota</dt>
-                                            <dd class="mt-1 text-lg font-semibold tracking-tight text-text-main">
-                                                {{ $user->kode_anggota }}</dd>
+                                        {{-- PERBAIKAN DI DUA DIV DI BAWAH INI --}}
+                                        <div class="flex flex-col rounded-lg bg-surface dark:bg-dark-surface px-4 py-3">
+                                            <dt class="text-sm font-medium text-text-subtle dark:text-dark-text-subtle">
+                                                Kode Anggota
+                                            </dt>
+                                            <dd
+                                                class="mt-1 text-lg font-semibold tracking-tight text-text-main dark:text-dark-text-main">
+                                                {{ $user->kode_anggota }}
+                                            </dd>
                                         </div>
-                                        <div class="flex flex-col rounded-lg bg-surface px-4 py-3">
-                                            <dt class="text-sm font-medium text-text-subtle">Total Pinjam</dt>
-                                            <dd class="mt-1 text-lg font-semibold tracking-tight text-text-main">
-                                                {{ $user->peminjaman_count }}</dd>
+                                        <div class="flex flex-col rounded-lg bg-surface dark:bg-dark-surface px-4 py-3">
+                                            <dt class="text-sm font-medium text-text-subtle dark:text-dark-text-subtle">
+                                                Total Pinjam
+                                            </dt>
+                                            <dd
+                                                class="mt-1 text-lg font-semibold tracking-tight text-text-main dark:text-dark-text-main">
+                                                {{ $user->peminjaman_count }}
+                                            </dd>
                                         </div>
                                     </dl>
                                 </div>
 
-                                <div class="mt-4 pt-4 flex items-center gap-2 border-t border-gray-200">
+                                <div
+                                    class="mt-4 pt-4 flex items-center gap-2 border-t border-gray-200 dark:border-dark-primary">
                                     <a href="{{ route('users.edit', $user) }}"
-                                        class="flex-1 text-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-text-main shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Edit</a>
+                                        class="flex-1 text-center rounded-md bg-success px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-opacity-90 transition-colors">Edit</a>
                                     <form action="{{ route('users.destroy', $user) }}" method="POST"
                                         id="delete-form-user-{{ $user->id }}">
                                         @csrf
@@ -94,7 +107,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="col-span-full text-center text-text-subtle py-10">
+                            <div class="col-span-full text-center text-text-subtle dark:text-dark-text-subtle py-10">
                                 <p>Data anggota belum tersedia.</p>
                             </div>
                         @endforelse
@@ -112,12 +125,13 @@
     @push('scripts')
         <script>
             function showAlert(id, module) {
+                const isDarkMode = document.documentElement.classList.contains('dark');
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     text: "Data yang sudah dihapus tidak dapat dikembalikan!",
                     icon: 'warning',
-                    background: '#ffffff',
-                    color: '#111827',
+                    background: isDarkMode ? '#1A1A1A' : '#ffffff',
+                    color: isDarkMode ? '#EDEDED' : '#111827',
                     showCancelButton: true,
                     confirmButtonColor: '#e11d48',
                     cancelButtonColor: '#6b7280',

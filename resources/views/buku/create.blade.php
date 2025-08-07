@@ -1,20 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Tambah Buku Baru') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8" x-data="bookScanner()">
 
                     {{-- BAGIAN 1: FITUR TAMBAH CEPAT DENGAN AI --}}
-                    <div class="mb-8 pb-8 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold leading-6 text-text-main">Tambah Cepat dengan AI</h3>
-                        <p class="mt-1 text-sm text-text-subtle">Unggah gambar sampul dan biarkan sistem mengisi
-                            detailnya secara otomatis di form di bawah ini.</p>
+                    <div class="mb-8 pb-8 border-b border-gray-200 dark:border-dark-primary">
+                        <h3 class="text-lg font-semibold leading-6 text-text-main dark:text-dark-text-main">Tambah Cepat
+                            dengan AI</h3>
+                        <p class="mt-1 text-sm text-text-subtle dark:text-dark-text-subtle">Unggah gambar sampul dan
+                            biarkan sistem mengisi detailnya secara otomatis di form di bawah ini.</p>
 
                         <button type="button" @click="$refs.coverInput.click()" :disabled="isLoading"
                             class="mt-4 inline-flex items-center gap-x-2 rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-opacity-90 disabled:bg-opacity-70 disabled:cursor-not-allowed transition-colors duration-200">
@@ -40,12 +41,14 @@
                         <input type="file" x-ref="coverInput" @change="handleFileSelect" class="hidden"
                             accept="image/png, image/jpeg, image/webp">
 
-                        <div x-show="errorMessage" x-cloak class="mt-4 p-4 bg-red-50 rounded-lg text-sm text-red-700"
+                        <div x-show="errorMessage" x-cloak
+                            class="mt-4 p-4 bg-red-50 dark:bg-danger/20 rounded-lg text-sm text-red-700 dark:text-red-300"
                             x-text="errorMessage"></div>
                     </div>
 
                     {{-- BAGIAN 2: FORM PENGISIAN MANUAL --}}
-                    <h3 class="text-lg font-semibold leading-6 text-text-main">Detail Buku (Manual)</h3>
+                    <h3 class="text-lg font-semibold leading-6 text-text-main dark:text-dark-text-main">Detail Buku
+                        (Manual)</h3>
                     <form action="{{ route('buku.store') }}" method="POST" enctype="multipart/form-data"
                         class="mt-6 space-y-6">
                         @csrf
@@ -60,7 +63,7 @@
                         <div>
                             <x-input-label for="kategori_id" value="Kategori" />
                             <select id="kategori_id" name="kategori_id"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary text-text-main">
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-dark-surface dark:text-dark-text-main rounded-md shadow-sm focus:border-primary dark:focus:border-dark-primary focus:ring-primary dark:focus:ring-dark-primary">
                                 <option value="">- Pilih Kategori -</option>
                                 @foreach ($kategori as $item)
                                     <option value="{{ $item->id }}">{{ $item->nama_kategori }}</option>
@@ -72,7 +75,7 @@
                         <div>
                             <x-input-label for="id_penerbit" value="Penerbit" />
                             <select id="id_penerbit" name="id_penerbit"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary text-text-main"
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-dark-surface dark:text-dark-text-main rounded-md shadow-sm focus:border-primary dark:focus:border-dark-primary focus:ring-primary dark:focus:ring-dark-primary"
                                 required>
                                 <option value="">- Pilih Penerbit -</option>
                                 @foreach ($penerbit as $item)
@@ -106,15 +109,15 @@
                         <div>
                             <x-input-label for="sampul" value="Gambar Sampul (Manual)" />
                             <input id="sampul" name="sampul" type="file"
-                                class="mt-1 block w-full text-sm text-text-subtle border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
-                            <p class="mt-1 text-xs text-text-subtle">Gunakan ini jika pemindai AI gagal atau untuk
-                                mengunggah gambar spesifik.</p>
+                                class="mt-1 block w-full text-sm text-text-subtle dark:text-dark-text-subtle border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-dark-surface focus:outline-none">
+                            <p class="mt-1 text-xs text-text-subtle dark:text-dark-text-subtle">Gunakan ini jika
+                                pemindai AI gagal atau untuk mengunggah gambar spesifik.</p>
                             <x-input-error :messages="$errors->get('sampul')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end gap-x-4 pt-6">
                             <a href="{{ route('buku.index') }}"
-                                class="text-sm font-semibold leading-6 text-text-subtle hover:text-text-main">Batal</a>
+                                class="text-sm font-semibold leading-6 text-text-subtle dark:text-dark-text-subtle hover:text-text-main dark:hover:text-dark-text-main">Batal</a>
                             <x-primary-button>{{ __('Simpan Buku') }}</x-primary-button>
                         </div>
                     </form>

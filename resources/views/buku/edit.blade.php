@@ -1,17 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="font-semibold text-xl text-text-main dark:text-dark-text-main leading-tight">
             {{ __('Edit Data Buku') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-surface dark:bg-dark-surface overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8">
 
+                    {{-- Menambahkan onsubmit untuk memanggil SweetAlert --}}
                     <form action="{{ route('buku.update', $buku->id) }}" method="POST" enctype="multipart/form-data"
-                        class="space-y-6">
+                        class="space-y-6" onsubmit="confirmUpdate(event)">
                         @csrf
                         @method('PUT')
 
@@ -23,9 +24,16 @@
                         </div>
 
                         <div>
+                            <x-input-label for="sinopsis" value="Sinopsis" />
+                            <textarea id="sinopsis" name="sinopsis" rows="4"
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-dark-surface dark:text-dark-text-main focus:border-primary dark:focus:border-dark-primary focus:ring-primary dark:focus:ring-dark-primary rounded-md shadow-sm">{{ old('sinopsis', $buku->sinopsis) }}</textarea>
+                            <x-input-error :messages="$errors->get('sinopsis')" class="mt-2" />
+                        </div>
+
+                        <div>
                             <x-input-label for="id_penerbit" value="Penerbit" />
                             <select id="id_penerbit" name="id_penerbit"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary text-text-main"
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-dark-surface dark:text-dark-text-main rounded-md shadow-sm focus:border-primary dark:focus:border-dark-primary focus:ring-primary dark:focus:ring-dark-primary"
                                 required>
                                 <option value="">- Pilih Penerbit -</option>
                                 @foreach ($penerbit as $item)
@@ -66,15 +74,16 @@
                                     class="w-32 h-auto rounded-md mt-2 mb-2 shadow-md">
                             @endif
                             <input id="sampul" name="sampul" type="file"
-                                class="mt-1 block w-full text-sm text-text-subtle border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
-                            <p class="mt-1 text-xs text-text-subtle">Biarkan kosong jika tidak ingin mengganti sampul.
+                                class="mt-1 block w-full text-sm text-text-subtle dark:text-dark-text-subtle border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-dark-surface focus:outline-none">
+                            <p class="mt-1 text-xs text-text-subtle dark:text-dark-text-subtle">Biarkan kosong jika
+                                tidak ingin mengganti sampul.
                             </p>
                             <x-input-error :messages="$errors->get('sampul')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end gap-x-4 pt-6">
                             <a href="{{ route('buku.index') }}"
-                                class="text-sm font-semibold leading-6 text-text-subtle hover:text-text-main">Batal</a>
+                                class="text-sm font-semibold leading-6 text-text-subtle dark:text-dark-text-subtle hover:text-text-main dark:hover:text-dark-text-main">Batal</a>
                             <x-primary-button>{{ __('Update Buku') }}</x-primary-button>
                         </div>
                     </form>
@@ -83,4 +92,35 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            function confirmUpdate(event) {
+                event.preventDefault(); // Mencegah form dikirim secara langsung
+
+                const isDarkMode = document.documentElement.classList.contains('dark');
+
+                Swal.fire({
+                    title: 'Konfirmasi Perubahan',
+                    text: "Apakah Anda yakin ingin menyimpan perubahan ini?",
+                    icon: 'question',
+
+                    // PERUBAHAN DI SINI: Menggunakan warna dari palet baru Anda
+                    background: isDarkMode ? '#1A1A1A' : '#ffffff', // dark-surface
+                    color: isDarkMode ? '#EDEDED' : '#111827', // dark-text-main
+
+                    showCancelButton: true,
+                    confirmButtonColor: '#16a34a', // Warna success
+                    cancelButtonColor: '#6b7280', // Warna text-subtle
+                    confirmButtonText: 'Ya, Simpan!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika dikonfirmasi, kirim form
+                        event.target.submit();
+                    }
+                })
+            }
+        </script>
+    @endpush
 </x-app-layout>
